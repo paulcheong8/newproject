@@ -1,0 +1,23 @@
+<html>
+    <head>
+      {% if title %}
+      <title>{{ title }} - Smart Attendance</title>
+      {% else %}
+      <title>Welcome to Smart Attendance</title>
+      {% endif %}
+    </head>
+    <body>
+        <div><a href="/index">Home</a> 
+            <a href="/student">Student</a>
+            {% if current_user.is_anonymous %}
+            <a href="{{ url_for('login') }}">Admin Login</a>
+            {% else %}
+            <a href="{{ url_for('logout') }}">Admin Logout</a>
+            {% endif %}
+            <!-- <a href="/login">Admin</a> -->
+        </div>
+
+        <hr>
+        {% block content %}{% endblock %}
+    </body>
+</html>
