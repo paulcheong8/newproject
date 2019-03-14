@@ -1,6 +1,7 @@
 from app import db, login
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from sqlalchemy.orm import relationship
 
 student_course_table = db.Table('student_course', 
 db.Column('student_id', db.Integer, db.ForeignKey('student.id'), primary_key=True), 
@@ -67,7 +68,7 @@ class Mac(db.Model):
     mac_addresses = db.relationship('Readings', back_populates='mac', cascade='all', lazy=True, uselist=True)
 
 
-    def __init__(self, mac_address, student_id, mac_addresses):
+    def __init__(self, mac_address, student_id, mac_addresses=None):
         self.mac_address = mac_address
         self.student_id = student_id
         mac_addresses = [] if mac_addresses is None else mac_addresses
@@ -117,11 +118,13 @@ class Readings(db.Model):
     time_stamp = db.Column(db.String(120), index=True, unique=False)
     # foreign key with Receiver
     receiver_id = db.Column(db.Integer, db.ForeignKey('receiver.id'), nullable=False)
+    receiver = relationship("Receiver", back_populates='receivers', foreign_keys=[receiver_id])
     # # one to many relationship with Receiver
-    receiver = db.relationship('Receiver', back_populates='receivers')
+    # receiver = db.relationship('Receiver', back_populates='receivers')
     # foreign key with Mac 
     mac_id = db.Column(db.Integer, db.ForeignKey('mac.id'), nullable=False)
-    mac = db.relationship('Mac', back_populates='mac_addresses')
+    mac = relationship("Mac", back_populates='mac_addresses', foreign_keys=[mac_id])
+    # mac = db.relationship('Mac', back_populates='mac_addresses')
 
 
     def __init__(self, time_stamp, receiver_id, mac_id):
@@ -143,9 +146,10 @@ class Readings(db.Model):
 class Receiver(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     # foreign key with Readings
-    # readings_id = db.Column(db.Integer, db.ForeignKey('readings.id'), nullable=False)
+    readings_id = db.Column(db.Integer, db.ForeignKey('readings.id'), nullable=False)
     # # one to many relationship with Readings
-    # receivers = db.relationship('Readings', back_populates='receiver', cascade='all', lazy=True, uselist=True)
+    
+    receivers = db.relationship('Readings', back_populates='receiver', cascade='all', lazy=True, uselist=True)
     # foreign key with Location
     location_id = db.Column(db.Integer, db.ForeignKey('location.id'), nullable=False)
     location = db.relationship('Location', back_populates='locations')
