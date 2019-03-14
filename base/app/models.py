@@ -296,6 +296,7 @@ class Course(db.Model):
     
     id = db.Column(db.Integer, primary_key=True) 
     course_code = db.Column(db.String(120), unique=True, nullable=False)
+    # day = db.Column(db.String(120), unique=True, nullable=False) 
     start_time = db.Column(db.String(120), unique=True, nullable=False) 
     end_time = db.Column(db.String(120), unique=True, nullable=False)  
     # Many to Many relationship with Student
@@ -386,6 +387,8 @@ class Readings(db.Model):
 
     id = db.Column(db.Integer, primary_key=True) 
     time_stamp = db.Column(db.String(120), unique=True, nullable=False)
+    # day = db.Column(db.String(120), unique=False, nullable=False)
+    # time = db.Column(db.String(120), unique=False, nullable=False)
     mac_address = db.Column(db.String(120), unique=False, nullable=False)
     # Many to one relationship with Receiver
     receiver_id = db.Column(db.Integer, db.ForeignKey('receiver.id'), nullable=False) 

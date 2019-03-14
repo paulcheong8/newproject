@@ -50,7 +50,6 @@ def admin():
         return redirect(url_for('admin'))
     return render_template('admin.html', title='Course', form=form)
 
-#daryl de 
 @app.route('/addcourse', methods=["POST"])
 def add_course():
     course_code = request.json["course_code"]
@@ -106,6 +105,35 @@ def add_mac():
     except Exception as e:
         return (str(e))
 
+@app.route('/addReceiver', method=['POST'])
+def addReceiver():
+    try:
+        name = request.json['name']
+        # how to input with the location_id parameter? 
+        new_receiver = Receiver(name=name)
+        db.session.add(new_receiver)
+        db.session.commit()
+        return jsonify("{} was created".format(new_receiver))
+
+    except Exception as e:
+        return (str(e))
+
+@app.route('/getReadings', method=['POST'])
+def getReadings():
+    try:
+        time_stamp = request.json['time_stamp']
+        mac_address = request.json['mac_address']
+        # if mac_address in Mac.query.all()
+        new_reading = Readings(mac_address=mac_address, time_stamp=time_stamp)
+        # how to get get the receiver_id parameter? 
+        db.session.add(new_reading)
+        db.session.commit()
+        return jsonify("{} was created".format(new_reading))
+
+    except Exception as e:
+        return (str(e))
+
+#check if time is in Course[time] and day in Course[day] and Student in Course to get attendance
 
 #daryl de
 
@@ -120,6 +148,7 @@ def post_student():
     db.session.add(student)
     db.session.commit()
     return redirect(url_for('student')) 
+
 
 # @app.route('/post_admin', methods=['POST'])
 # def post_admin():
