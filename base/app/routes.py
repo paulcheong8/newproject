@@ -49,6 +49,43 @@ def admin():
         flash ('Course information has been updated!')
         return redirect(url_for('admin'))
     return render_template('admin.html', title='Course', form=form)
+
+#daryl de 
+@app.route('/addcourse', methods="POST")
+def add_course():
+    course_code = request.json["course_code"]
+    group_number = request.json["group_number"]
+    emails = request.json["emails"]
+    names = request.json["names"]
+    start_time = request.json["start_time"]
+    end_time = request.json["end_time"]
+    location = request.json["location"]
+    try:
+        new_course = Class(course_code=course_code, group=group_number, start_time=start_time, end_time=end_time, location=location)
+        db.session.add(new_course)
+        db.session.commit()
+        for i in range(len(emails)):
+            new_email = emails[i]
+            new_name = names[i]
+            new_student = Student(email=new_email,name=new_name)
+            db.session.add(new_student)
+            db.session.commit()
+        return jsonify("{} was created".format(new_course))
+    except Exception as e:
+        return (str(e))
+
+@app.route('/updateMAC', methods=["POST","PUT"])
+def add_mac():
+    try:
+        for mac in request.json["mac_addresses"]:
+            email = request.json["email"]
+            mac_address= mac
+            new_mac = Mac(mac_address=mac_address, student_email=email)
+            db.session.add()
+        return jsonify("{} was created".format(new_mac))
+    except Exception as e:
+        return (str(e))
+#daryl de
     
     
 @app.route('/student')
