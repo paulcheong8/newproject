@@ -82,7 +82,7 @@ def add_mac():
         for mac in request.json["mac_addresses"]:
             email = request.json["email"]
             mac_address= mac
-            new_mac = Mac(mac_address=mac_address, )
+            new_mac = Mac(mac_address=mac_address)
             db.session.add()
         return jsonify("{} was created".format(new_mac))
     except Exception as e:
