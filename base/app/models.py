@@ -56,7 +56,7 @@ class Student(db.Model):
             'mac_addresses': [m.serialize() for m in self.mac_addresses]
         }
 
-class Mac(db.model):
+class Mac(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     mac_address = db.Column(db.String(80), unique=True, nullable=False)
     # foreign key with student
@@ -64,12 +64,15 @@ class Mac(db.model):
     # one to many relationship with student 
     student = db.relationship('Student', back_populates='mac_addresses')
     # for the foreign key with Readings
-    mac_addresses = db.relationship('Readings', back_populates='Mac', cascade='all', lazy=True, uselist=True)
+    mac_addresses = db.relationship('Readings', back_populates='mac', cascade='all', lazy=True, uselist=True)
 
 
-    def __init__(self, mac_address, student_id):
+    def __init__(self, mac_address, student_id, mac_addresses):
         self.mac_address = mac_address
         self.student_id = student_id
+        mac_addresses = [] if mac_addresses is None else mac_addresses
+        self.mac_addresses = mac_addresses
+
 
     def __repr__(self):
         return '<Mac {}>'.format(self.mac_address)
@@ -78,7 +81,8 @@ class Mac(db.model):
         return { 
             'id': self.id, 
             'mac_address': self.mac_address,
-            'student_id': self.student_id
+            'student_id': self.student_id,
+            'mac_addresses': [m.serialize() for m in self.mac_addresses]
         }
 
 class Course(db.Model):
@@ -120,9 +124,10 @@ class Readings(db.Model):
     mac = db.relationship('Mac', back_populates='mac_addresses')
 
 
-    def __init__(self, time_stamp, receiver_id):
+    def __init__(self, time_stamp, receiver_id, mac_id):
         self.time_stamp = time_stamp
         self.receiver_id = receiver_id
+        self.mac_id = mac_id
 
     def __repr__(self):
         return '<Reader {}>'.format(self.id)
@@ -132,18 +137,22 @@ class Readings(db.Model):
             'id': self.id,
             'time_stamp': self.time_stamp,
             'receiver_id': self.receiver_id,
+            'mac_id': self.mac_id
         }   
 
 class Receiver(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    # foreign key with Readings
+    readings_id = db.Column(db.Integer, db.ForeignKey('readings.id'), nullable=False)
     # one to many relationship with Readings
     receivers = db.relationship('Readings', back_populates='receiver', cascade='all', lazy=True, uselist=True)
     # foreign key with Location
     location_id = db.Column(db.Integer, db.ForeignKey('location.id'), nullable=False)
     location = db.relationship('Location', back_populates='locations')
 
-    def __init__(self, location_id):
+    def __init__(self, location_id, readings_id):
         self.location_id = location_id
+        self.readings_id = readings_id
 
     def __repr__(self):
         return '<Receiver {}>'.format(self.id)
@@ -152,6 +161,7 @@ class Receiver(db.Model):
         return { 
             'id': self.id,
             'location_id': self.location_id
+            'readings_id': self.readings_id
         }   
 
 class Location(db.Model):
@@ -171,7 +181,10 @@ class Location(db.Model):
             'id': self.id,
             'location_id': self.location
         } 
-#cannot pushhhhhh
+
 @login.user_loader
 def load_user(id):
     return Admin.query.get(int(id))
+
+
+#this is another change
