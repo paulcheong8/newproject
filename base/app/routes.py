@@ -60,18 +60,21 @@ def add_course():
     end_time = request.json["end_time"]
     location = request.json["location"]
     try:
-        new_course = Course(course_code=course_code, start_time=start_time, end_time=end_time)
+        new_location = Location(venue=location)
+        db.session.add(new_location)
+        db.session.commit()
+        print (new_location.id)
+        new_course = Course(course_code=course_code, start_time=start_time, end_time=end_time, location_id=new_location.id)
         db.session.add(new_course)
         db.session.commit()
+
         for i in range(len(emails)):
             new_email = emails[i]
             new_name = names[i]
             new_student = Student(email=new_email,name=new_name)
             db.session.add(new_student)
             db.session.commit()
-        new_location = Location(location=location)
-        db.session.add(new_location)
-        db.session.commit()
+
         return jsonify("{} was created".format(new_course))
     except Exception as e:
         return (str(e))
@@ -79,14 +82,26 @@ def add_course():
 @app.route('/updateMAC', methods=["POST","PUT"])
 def add_mac():
     try:
-        for mac in request.json["mac_addresses"]:
-            email = request.json["email"]
-            mac_address= mac
-            student = Student.query.get(email)
+        mac_addresses = request.json['mac_addresses']
+        emails = request.json['email']
+        for i in range(len(mac_addresses)):
+            mac_address = mac_addresses[i]
+            email = emails[i]
+            student = db.session.query(Student).filter(Student.email==email).first()
             SID = student.id
-            new_mac = Mac(mac_address=mac_address, student_id = SID, mac_addresses = None)
+            # student = Student.query.filter_by(email=email)
+            # SID = student.id
+            new_mac = Mac(mac_address=mac_address, student_id=SID)
             db.session.add(new_mac)
             db.session.commit()
+        # for mac in request.json["mac_addresses"]:
+        #     email = request.json["email"]
+        #     mac_address= mac
+        #     student = Student.query.filter_by(email=email)
+        #     SID = student.id
+        #     new_mac = Mac(mac_address=mac_address, student_id = SID)
+        #     db.session.add(new_mac)
+        #     db.session.commit()
         return jsonify("{} was created".format(new_mac))
     except Exception as e:
         return (str(e))
