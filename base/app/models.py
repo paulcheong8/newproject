@@ -117,7 +117,7 @@ class Readings(db.Model):
     time_stamp = db.Column(db.String(120), index=True, unique=False)
     # foreign key with Receiver
     receiver_id = db.Column(db.Integer, db.ForeignKey('receiver.id'), nullable=False)
-    # one to many relationship with Receiver
+    # # one to many relationship with Receiver
     receiver = db.relationship('Receiver', back_populates='receivers')
     # foreign key with Mac 
     mac_id = db.Column(db.Integer, db.ForeignKey('mac.id'), nullable=False)
@@ -143,9 +143,9 @@ class Readings(db.Model):
 class Receiver(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     # foreign key with Readings
-    readings_id = db.Column(db.Integer, db.ForeignKey('readings.id'), nullable=False)
-    # one to many relationship with Readings
-    receivers = db.relationship('Readings', back_populates='receiver', cascade='all', lazy=True, uselist=True)
+    # readings_id = db.Column(db.Integer, db.ForeignKey('readings.id'), nullable=False)
+    # # one to many relationship with Readings
+    # receivers = db.relationship('Readings', back_populates='receiver', cascade='all', lazy=True, uselist=True)
     # foreign key with Location
     location_id = db.Column(db.Integer, db.ForeignKey('location.id'), nullable=False)
     location = db.relationship('Location', back_populates='locations')
@@ -160,7 +160,7 @@ class Receiver(db.Model):
     def serialize(self): 
         return { 
             'id': self.id,
-            'location_id': self.location_id
+            'location_id': self.location_id,
             'readings_id': self.readings_id
         }   
 
@@ -186,5 +186,4 @@ class Location(db.Model):
 def load_user(id):
     return Admin.query.get(int(id))
 
-
-#this is another change
+#this is change 1415
