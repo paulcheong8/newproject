@@ -79,17 +79,19 @@ def add_course():
 @app.route('/updateMAC', methods=["POST","PUT"])
 def add_mac():
     try:
-        for mac in request.json["mac_addresses"]:
-            email = request.json["email"]
-            mac_address= mac
-            new_mac = Mac(mac_address=mac_address, )
-            db.session.add()
+        email = request.json["email"]
+        mac_address= request.json["mac"]
+        student = Student.query.get(email)
+        SID = student.id
+        new_mac = Mac(mac_address=mac_address, student_id = SID, mac_addresses = None)
+        db.session.add()
         return jsonify("{} was created".format(new_mac))
     except Exception as e:
         return (str(e))
+
+
 #daryl de
-    
-    
+
 @app.route('/student')
 def student():
     return render_template('student.html', title='Home')
