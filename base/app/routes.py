@@ -1,7 +1,7 @@
 from app import app
 from flask import render_template, request, redirect, url_for, flash, jsonify
 from app import db
-from app.models import Student, Course, Admin, Mac, Location, Receiver, Readings
+from app.models import Student, Course, Admin, Mac, Location, Receiver
 from app.forms import LoginForm, AdminForm
 from flask_login import current_user, login_user, logout_user
 
@@ -57,24 +57,32 @@ def add_course():
     names = request.json["names"]
     start_time = request.json["start_time"]
     end_time = request.json["end_time"]
+    start_date = request.json['start_date']
+    end_date = request.json['end_date']
     location = request.json["location"]
     try:
         # query if the location already exists then:
-        new_location = Location(venue=location)
-        db.session.add(new_location)
-        db.session.commit()
-        print (new_location.id)
-        #add students using an array 
-        new_course = Course(course_code=course_code, start_time=start_time, end_time=end_time, location_id=new_location.id) #students[]
-        db.session.add(new_course)
-        db.session.commit()
+        # Location.query.filter_by(venue=location).first() == True
+        if db.session.query(Location).filter(Location.venue==location).first() == True:
+            new_location = db.session.query(Location).filter(Location.venue==location).first() 
 
+        else: 
+            new_location = Location(venue=location)
+            db.session.add(new_location)
+            db.session.commit()
+        
+        student_array = []
         for i in range(len(emails)):
             new_email = emails[i]
             new_name = names[i]
             new_student = Student(email=new_email,name=new_name)
             db.session.add(new_student)
-            db.session.commit()
+            student_array.append(new_student)
+
+        new_course = Course(course_code=course_code, start_time=start_time, end_time=end_time, 
+        start_date=start_date, end_date=end_date ,location_id=new_location.id, students=student_array)
+        db.session.add(new_course)
+        db.session.commit()
 
         return jsonify("{} was created".format(new_course))
     except Exception as e:
@@ -105,28 +113,31 @@ def addReceiver():
         location_temp = request.json["location"]
         location = db.session.query(Location).filter(Location.venue==location_temp).first()
         LID = location.id
-        new_receiver = Receiver(name=name,location_id = LID)
+        new_receiver = Receiver(name=name, location_id=LID)
         db.session.add(new_receiver)
         db.session.commit()
         return jsonify("{} was created".format(new_receiver))
     except Exception as e:
         return (str(e))
 
-@app.route('/createReadings', methods=['POST'])
-def createReadings():
-    try:
-        time_stamp = request.json['time_stamp']
-        mac_address = request.json['mac_address']
-        # check if mac_address exists in Mac.query.all()
-        new_reading = Readings(mac_address=mac_address, time_stamp=time_stamp)
-        #check if receiver_id exists in the Receiver table 
-        # how to get get the receiver_id parameter? 
-        db.session.add(new_reading)
-        db.session.commit()
-        return jsonify("{} was created".format(new_reading))
+# @app.route('/getAttendance', methods=['GET'])
+# def getAttendance():
 
-    except Exception as e:
-        return (str(e))
+# @app.route('/createReadings', methods=['POST'])
+# def createReadings():
+#     try:
+#         # time_stamp = request.json['time_stamp']
+#         mac_address = request.json['mac_address']
+#         # check if mac_address exists in Mac.query.all()
+#         new_reading = Readings(mac_address=mac_address, time_stamp=time_stamp)
+#         #check if receiver_id exists in the Receiver table 
+#         # how to get get the receiver_id parameter? 
+#         db.session.add(new_reading)
+#         db.session.commit()
+#         return jsonify("{} was created".format(new_reading))
+
+#     except Exception as e:
+#         return (str(e))
 
 #check if time is in Course[time] and day in Course[day] and Student in Course to get attendance
 

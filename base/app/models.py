@@ -3,6 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from sqlalchemy.orm import relationship
 from sqlalchemy import ForeignKeyConstraint
+import datetime
 
 # student_course_table = db.Table('student_course', 
 # db.Column('student_id', db.Integer, db.ForeignKey('student.id'), primary_key=True), 
@@ -276,10 +277,14 @@ class Mac(db.Model):
     # Many to one relationship with Student
     student_id = db.Column(db.Integer, db.ForeignKey('student.id'), nullable=False) 
     student = db.relationship('Student', back_populates='addresses')
+    # Foreign key with Readings
+    # readings = db.relationship('Readings', back_populates='mac_address', cascade='all', lazy=True, uselist=True)
 
-    def __init__(self, mac_address, student_id): 
+    def __init__(self, mac_address, student_id): #readings=None): 
         self.mac_address = mac_address
         self.student_id = student_id
+        # readings = [] if readings is None else readings 
+        # self.readings = readings
 
     def __repr__(self):
         return '<Mac {}>'.format(self.mac_address)
@@ -289,6 +294,7 @@ class Mac(db.Model):
             'id': self.id, 
             'mac_address': self.mac_address,
             'student_id': self.student_id
+            # 'readings':[r.serialize() for r in self.readings]
         }
 
 class Course(db.Model): 
@@ -297,18 +303,22 @@ class Course(db.Model):
     id = db.Column(db.Integer, primary_key=True) 
     course_code = db.Column(db.String(120), unique=True, nullable=False)
     # day = db.Column(db.String(120), unique=True, nullable=False) 
-    start_time = db.Column(db.String(120), unique=True, nullable=False) 
-    end_time = db.Column(db.String(120), unique=True, nullable=False)  
+    start_time = db.Column(db.String(120), unique=False, nullable=False) 
+    end_time = db.Column(db.String(120), unique=False, nullable=False)  
+    start_date = db.Column(db.String(120), unique=False, nullable=False)  
+    end_date = db.Column(db.String(120), unique=False, nullable=False)  
     # Many to Many relationship with Student
     students = db.relationship('Student', secondary=student_course_table, lazy=True, back_populates='courses')
     # Many to one relationship with Location
     location_id = db.Column(db.Integer, db.ForeignKey('location.id'), nullable=False) 
     location = db.relationship('Location', back_populates='course')
 
-    def __init__(self, course_code, start_time, end_time, location_id, students=None): 
+    def __init__(self, course_code, start_time, end_time, start_date, end_date, location_id, students=None): 
         self.course_code = course_code 
         self.start_time = start_time
         self.end_time = end_time
+        self.start_date = start_date
+        self.end_date = end_date
         self.location_id = location_id
         students = [] if students is None else students 
         self.students = students 
@@ -363,13 +373,13 @@ class Receiver(db.Model):
     location_id = db.Column(db.Integer, db.ForeignKey('location.id'), nullable=False) 
     location = db.relationship('Location', back_populates='receiver')
     # One to many relationship with Readings
-    readings = db.relationship('Readings', back_populates='receiver', cascade='all', lazy=True, uselist=True)
+    # readings = db.relationship('Readings', back_populates='receiver', cascade='all', lazy=True, uselist=True)
 
-    def __init__(self, name, location_id, readings=None): 
+    def __init__(self, name, location_id): #readings=None): 
         self.name = name 
         self.location_id = location_id
-        readings = [] if readings is None else readings 
-        self.readings = readings 
+        # readings = [] if readings is None else readings 
+        # self.readings = readings 
 
     def __repr__(self):
         return '<Receiver {}>'.format(self.name)
@@ -378,38 +388,63 @@ class Receiver(db.Model):
         return { 
             'id': self.id, 
             'name': self.name,
-            'location_id': self.location_id,
-            'readings':[r.serialize() for r in self.receiver]
+            'location_id': self.location_id
+            # 'readings':[r.serialize() for r in self.receiver]
         }
 
-class Readings(db.Model):
-    __tablename__ = 'readings'
+# class Readings(db.Model):
+#     __tablename__ = 'readings'
 
-    id = db.Column(db.Integer, primary_key=True) 
-    #use datetime
-    #time_stamp = db.Column(db.String(120), unique=True, nullable=False)
-    # day = db.Column(db.String(120), unique=False, nullable=False)
-    # time = db.Column(db.String(120), unique=False, nullable=False)
-    mac_address = db.Column(db.String(120), unique=False, nullable=False)
-    # Many to one relationship with Receiver
-    receiver_id = db.Column(db.Integer, db.ForeignKey('receiver.id'), nullable=False) 
-    receiver = db.relationship('Receiver', back_populates='readings')
+#     id = db.Column(db.Integer, primary_key=True) 
+#     modified_timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+#     # mac_address = db.Column(db.String(120), unique=False, nullable=False)
+#     # Foreign key with Mac
+#     mac_id = db.Column(db.Integer, db.ForeignKey('mac.id'), nullable=False) 
+#     mac_address = db.relationship('Mac', back_populates='readings')
+#     # Many to one relationship with Receiver
+#     receiver_id = db.Column(db.Integer, db.ForeignKey('receiver.id'), nullable=False) 
+#     receiver = db.relationship('Receiver', back_populates='readings')
 
-    def __init__(self, time_stamp, mac_address, receiver_id): 
-        self.time_stamp = time_stamp
-        self.mac_address = mac_address 
-        self.receiver_id = receiver_id
+#     def __init__(self, modified_timestamp, mac_address, receiver_id): 
+#         self.modified_timestamp = modified_timestamp
+#         self.mac_address = mac_address 
+#         self.receiver_id = receiver_id
 
-    def __repr__(self):
-        return '<Readings {}>'.format(self.time_stamp)
+#     def __repr__(self):
+#         return '<Readings {}>'.format(self.modified_timestamp)
 
-    def serialize(self): 
-        return { 
-            'id': self.id, 
-            'time_stamp': self.time_stamp,
-            'mac_address': self.mac_address,
-            'receiver_id': self.receiver_id
-        }
+#     def serialize(self): 
+#         return { 
+#             'id': self.id, 
+#             'modified_timestamp': self.modified_timestamp,
+#             'mac_address': self.mac_address,
+#             'receiver_id': self.receiver_id
+#         }
+
+# class Attendance(db.Model):
+#     __tablename__ = 'attendance'
+
+#     id = db.Column(db.Integer, primary_key=True) 
+#     status = db.Column(db.String(120), unique=False, nullable=False)
+#     # Foreign keys with student_course table 
+#     student_id = db.Column(db.Integer, db.ForeignKey('student.id'), nullable=False) 
+#     course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False) 
+
+#     def __init__(self, status, student_id, course_id):
+#         self.status
+#         self.student_id = student_id
+#         self.course_id = course_id
+
+#     def __repr__(self):
+#         return '<Attendance {}>'.format(self.id)
+
+#     def serialize(self): 
+#         return { 
+#             'id': self.id, 
+#             'status': self.status,
+#             'student_id': self.student_id,
+#             'course_id': self.course_id
+#         }
 
 @login.user_loader
 def load_user(id):
