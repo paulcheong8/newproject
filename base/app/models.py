@@ -309,7 +309,7 @@ class Course(db.Model):
         self.course_code = course_code 
         self.start_time = start_time
         self.end_time = end_time
-        self.location_id
+        self.location_id = location_id
         students = [] if students is None else students 
         self.students = students 
 
@@ -386,7 +386,8 @@ class Readings(db.Model):
     __tablename__ = 'readings'
 
     id = db.Column(db.Integer, primary_key=True) 
-    time_stamp = db.Column(db.String(120), unique=True, nullable=False)
+    #use datetime
+    #time_stamp = db.Column(db.String(120), unique=True, nullable=False)
     # day = db.Column(db.String(120), unique=False, nullable=False)
     # time = db.Column(db.String(120), unique=False, nullable=False)
     mac_address = db.Column(db.String(120), unique=False, nullable=False)

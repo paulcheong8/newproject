@@ -59,11 +59,13 @@ def add_course():
     end_time = request.json["end_time"]
     location = request.json["location"]
     try:
+        # query if the location already exists then:
         new_location = Location(venue=location)
         db.session.add(new_location)
         db.session.commit()
         print (new_location.id)
-        new_course = Course(course_code=course_code, start_time=start_time, end_time=end_time, location_id=new_location.id)
+        #add students using an array 
+        new_course = Course(course_code=course_code, start_time=start_time, end_time=end_time, location_id=new_location.id) #students[]
         db.session.add(new_course)
         db.session.commit()
 
@@ -105,7 +107,7 @@ def add_mac():
     except Exception as e:
         return (str(e))
 
-@app.route('/addReceiver', method=['POST'])
+@app.route('/addReceiver', methods=['POST'])
 def addReceiver():
     try:
         name = request.json['name']
@@ -118,13 +120,14 @@ def addReceiver():
     except Exception as e:
         return (str(e))
 
-@app.route('/getReadings', method=['POST'])
-def getReadings():
+@app.route('/createReadings', methods=['POST'])
+def createReadings():
     try:
         time_stamp = request.json['time_stamp']
         mac_address = request.json['mac_address']
-        # if mac_address in Mac.query.all()
+        # check if mac_address exists in Mac.query.all()
         new_reading = Readings(mac_address=mac_address, time_stamp=time_stamp)
+        #check if receiver_id exists in the Receiver table 
         # how to get get the receiver_id parameter? 
         db.session.add(new_reading)
         db.session.commit()
