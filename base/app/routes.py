@@ -102,11 +102,13 @@ def addReceiver():
     try:
         name = request.json['name']
         # how to input with the location_id parameter? 
-        new_receiver = Receiver(name=name)
+        location_temp = request.json["location"]
+        location = db.session.query(Location).filter(Location.venue==location_temp).first()
+        LID = location.id
+        new_receiver = Receiver(name=name,location_id = LID)
         db.session.add(new_receiver)
         db.session.commit()
         return jsonify("{} was created".format(new_receiver))
-
     except Exception as e:
         return (str(e))
 
