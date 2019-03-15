@@ -90,19 +90,9 @@ def add_mac():
             email = emails[i]
             student = db.session.query(Student).filter(Student.email==email).first()
             SID = student.id
-            # student = Student.query.filter_by(email=email)
-            # SID = student.id
             new_mac = Mac(mac_address=mac_address, student_id=SID)
             db.session.add(new_mac)
             db.session.commit()
-        # for mac in request.json["mac_addresses"]:
-        #     email = request.json["email"]
-        #     mac_address= mac
-        #     student = Student.query.filter_by(email=email)
-        #     SID = student.id
-        #     new_mac = Mac(mac_address=mac_address, student_id = SID)
-        #     db.session.add(new_mac)
-        #     db.session.commit()
         return jsonify("{} was created".format(new_mac))
     except Exception as e:
         return (str(e))
@@ -137,8 +127,6 @@ def createReadings():
         return (str(e))
 
 #check if time is in Course[time] and day in Course[day] and Student in Course to get attendance
-
-#daryl de
 
 @app.route('/student')
 def student():
