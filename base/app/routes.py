@@ -120,6 +120,49 @@ def addReceiver():
     except Exception as e:
         return (str(e))
 
+@app.route('/addReadings', methods =['POST'])
+def addreadings():
+    try:
+        student_mac_dict = {} #get a dictionary that can store SID : mac address
+        macs = Mac.query.all()
+        for m in macs: 
+            mac_address = m.mac_address 
+            student_id = m.student_id
+            student_mac_dict[student_id] = mac_address
+            
+        student_id = []
+        student_name = []
+        student_email = []
+        students = Student.query.all()
+        for s in students:
+            sid = s.id
+            student_id.append(sid)
+            sname = s.name
+            student_name.append(sname)
+            semail = s.email
+            student_email.append(semail)
+        
+        reciever_output = request.json['macs'] #retrieve data from job
+        attendance = {}
+        for sid,mac in student_mac_dict:
+            if mac in reciever_output:
+                if sid not in attendance:
+                    attendance[sid] = 1
+                else:
+                    attendance[sid] += 1
+
+        live_output = {
+            "course_group" : "",
+            "time" : "",
+            "student_names" : student_name,
+            "email": student_email,
+            "attendance": attendance
+        }
+        #send -> location, student_id, student_name, student_email, attendance
+        return render_template("display.php",student_dict = live_output)
+    except Exception as e:
+        return (str(e))
+
 # @app.route('/getAttendance', methods=['GET'])
 # def getAttendance():
 
