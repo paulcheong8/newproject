@@ -7,13 +7,15 @@
       {% endif %}
     </head>
     <body>
-        <div><a href="/index">Home</a> 
+        <div>
             <a href="/student">Student</a>
+            <a href="/admin">Admin</a>
             {% if current_user.is_anonymous %}
-            <a href="{{ url_for('login') }}">Admin Login</a>
+            <a href="{{ url_for('login') }}">Login</a>
             {% else %}
-            <a href="{{ url_for('logout') }}">Admin Logout</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
             {% endif %}
+            <a href="/attendance">Attendance</a> 
             <!-- <a href="/login">Admin</a> -->
         </div>
 

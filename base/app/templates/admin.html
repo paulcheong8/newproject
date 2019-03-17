@@ -1,64 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Course Information</h1>
-    <form action="" method="post" novalidate>
-        {{ form.hidden_tag() }}
-
-            {% with messages = get_flashed_messages() %}
-            {% if messages %}
-            <ul>
-                {% for message in messages %}
-                <li>{{ message }}</li>
-                {% endfor %}
-            </ul>
-            {% endif %}
-            {% endwith %}
-
-        <p>
-            {{ form.course_code.label }}<br>
-            {{ form.course_code(size=32) }}<br>
-            {% for error in form.course_code.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.student_name.label }}<br>
-            {{ form.student_name(size=32) }}<br>
-            {% for error in form.student_name.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.student_email.label }}<br>
-            {{ form.student_email(size=32) }}<br>
-            {% for error in form.student_email.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.group.label }}<br>
-            {{ form.group(size=32) }}<br>
-            {% for error in form.group.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.start_time.label }}<br>
-            {{ form.start_time(size=32) }}<br>
-            {% for error in form.start_time.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.end_time.label }}<br>
-            {{ form.end_time(size=32) }}<br>
-            {% for error in form.end_time.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-
-        <p>{{ form.submit() }}</p>
-
-    </form>
+<a href="{{ url_for('updateInformation') }}">Update Information</a>
+<br>
+<a href="{{ url_for('admin_add_receiver') }}">Add Receiver</a>
+<br>
+<a href="{{ url_for('attendance') }}">View Attendance</a>
 {% endblock %}

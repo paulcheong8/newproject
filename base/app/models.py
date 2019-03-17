@@ -237,6 +237,21 @@ class Admin(UserMixin, db.Model):
     #         'id': self.id, 
     #         'email': self.email, 
     #     }
+class StudentLogin(UserMixin, db.Model):
+    __tablename__ = 'studentlogin'
+
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), index=True, unique=True)
+    password_hash = db.Column(db.String(128))
+
+    def __repr__(self):
+        return '<Student Login {}>'.format(self.email)
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
 
 class Student(db.Model):
     __tablename__ = 'student'
@@ -421,6 +436,30 @@ class Receiver(db.Model):
 #             'receiver_id': self.receiver_id
 #         }
 
+class AttendanceTemp(db.Model):
+    __tablename__ = 'attendance_temp'
+
+    id = db.Column(db.Integer, primary_key=True) 
+    count = db.Column(db.Integer, unique=False, nullable=False)
+    student_id = db.Column(db.String(120), unique=False, nullable=False)
+    course_id = db.Column(db.String(120), unique=False, nullable=False)
+
+    def __init__(self, count, student_id, course_id):
+        self.count = count
+        self.student_id = student_id
+        self.course_id = course_id
+
+    def __repr__(self):
+        return '<Attendance {}>'.format(self.id)
+
+    def serialize(self): 
+        return { 
+            'id': self.id, 
+            'status': self.count,
+            'student_id': self.student_id,
+            'course_id': self.course_id
+        }
+
 class Attendance(db.Model):
     __tablename__ = 'attendance'
 
@@ -433,7 +472,7 @@ class Attendance(db.Model):
     # course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False) 
 
     def __init__(self, status, student_id, course_id):
-        self.status
+        self.status = status
         self.student_id = student_id
         self.course_id = course_id
 

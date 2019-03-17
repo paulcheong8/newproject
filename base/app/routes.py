@@ -1,54 +1,176 @@
 from app import app
 from flask import render_template, request, redirect, url_for, flash, jsonify
 from app import db
-from app.models import Student, Course, Admin, Mac, Location, Receiver, Attendance
-from app.forms import LoginForm, AdminForm
-from flask_login import current_user, login_user, logout_user
+from app.models import Student, Course, Admin, Mac, Location, Receiver, Attendance, StudentLogin
+from app.forms import LoginForm, AdminForm, StudentForm, ReceiverForm, AttendanceForm
+from flask_login import current_user, login_user, logout_user, login_required
+
 
 @app.route('/')
-@app.route('/index')
-def index():
-    user = {'username': 'Paul'}
-    return render_template('index.html', user=user)
+# @app.route('/index')
+# def index():
+#     user = {'username': 'Paul'}
+#     return render_template('index.html', user=user)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
+    # if current_user.is_authenticated:
+    #     return redirect(url_for('login'))
 
     form = LoginForm()
-
+    # login validation for admin
     if form.validate_on_submit():
         admin = Admin.query.filter_by(email=form.username.data).first()
-
-        if admin is None or not admin.check_password(form.password.data):
+        student = StudentLogin.query.filter_by(email=form.username.data).first()
+        print (admin is None)
+        print (student is not None)
+        print (not student.check_password(form.password.data))
+        # print (student.check_password(form.password.data) == True)
+        if (admin is None or not admin.check_password(form.password.data)) and (student is None or not student.check_password(form.password.data)):
             flash('Invalid email or password')
             return redirect(url_for('login'))
+        elif admin is not None and admin.check_password(form.password.data) == True:
+            login_user(admin, remember=form.remember_me.data)
+            return redirect(url_for('admin'))
+        elif student is not None and student.check_password(form.password.data) == True:
+            login_user(student, remember=form.remember_me.data)
+            return redirect(url_for('student'))
+        
+    # login validation for student
+    # if form.validate_on_submit():
+    #     student = StudentLogin.query.filter_by(email=form.username.data).first()
 
-        login_user(admin, remember=form.remember_me.data)
-        return redirect(url_for('admin'))
+    #     if student is None or not student.check_password(form.password.data):
+    #         flash('Invalid email or password')
+    #         return redirect(url_for('login'))
+
+    #     login_user(student, remember=form.remember_me.data)
+    #     return redirect(url_for('student'))
+
     return render_template('login.html', title='Sign In', form=form)
 
 @app.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('index'))
+    return redirect(url_for('login'))
 
 @app.route('/admin', methods=['GET', 'POST'])
+@login_required
 def admin():
+    return render_template('admin.html', title='Admin')
+
+@app.route('/admin/updateinformation', methods=['GET', 'POST'])
+@login_required
+def updateInformation():
     form = AdminForm()
     if form.validate_on_submit():
+        course_code = form.course_code.data
+        course_code = form.course_code.data
+        start_time = form.start_time.data
+        end_time = form.end_time.data
+        start_date = form.start_date.data
+        end_date = form.end_date.data
+        location = form.location.data
 
-        course = Course(course_code=form.course_code.data, 
-        start_time=form.start_time.data,
-        end_time=form.end_time.data)
+        student_array = []
+        student_details = form.student_details.data
+        with open(student_details, 'r') as f:
+            for line in f:
+                x = line.rstrip()
+                x = x.split(',')
+                new_email = x[0]
+                new_name = x[1]
+                new_student = Student(email=new_email, name=new_name)
+                db.session.add(new_student)
+                student_array.append(new_student)
 
-        db.session.add(course)
+        if db.session.query(Location).filter(Location.venue==location).first() == True:
+            new_location = db.session.query(Location).filter(Location.venue==location).first() 
+
+        else: 
+            new_location = Location(venue=location)
+            db.session.add(new_location)
+            db.session.commit()
+
+        new_course = Course(course_code=course_code, 
+        start_time=start_time, 
+        end_time=end_time, 
+        start_date=start_date, 
+        end_date=end_date,
+        location_id=new_location.id, 
+        students=student_array)
+
+        db.session.add(new_course)
         db.session.commit()
 
         flash ('Course information has been updated!')
-        return redirect(url_for('admin'))
-    return render_template('admin.html', title='Course', form=form)
+        return redirect(url_for('updateInformation'))
+    return render_template('updateinformation.html', title='Admin', form=form)
+
+@app.route('/admin/addReceiver', methods=['GET', 'POST'])
+@login_required
+def admin_add_receiver():
+    form = ReceiverForm()
+    if form.validate_on_submit():
+        name = form.name.data
+        location = form.location.data
+        # check if Receiver is already in the location
+        if db.session.query(Location).filter(Location.venue==location).first() == True:
+            new_location = db.session.query(Location).filter(Location.venue==location).first() 
+
+        else: 
+            new_location = Location(venue=location)
+            db.session.add(new_location)
+            db.session.commit()
+
+        LID = location.id
+        new_receiver = Receiver(name=name, location_id=LID)
+        db.session.add(new_receiver)
+        db.session.commit()
+
+        flash ('Receiver has been updated!')
+        return redirect(url_for('admin_add_receiver'))
+    return render_template('adminaddreceiver.html', title='Admin', form=form)        
+
+@app.route('/student')
+@login_required
+def student():
+    return render_template('student.html', title='Home')
+
+@app.route('/student/addMac', methods=["GET", "POST"])
+@login_required
+def student_add_mac():
+    form = StudentForm()
+    if form.validate_on_submit():
+        mac_addresses = form.mac_addresses.data
+        email = form.email.data
+        mac_addresses_array = mac_addresses.split(',')
+
+        for mac_address in mac_addresses_array: 
+            student = db.session.query(Student).filter(Student.email==email).first()
+            SID = student.id
+            new_mac = Mac(mac_address=mac_address, student_id=SID)
+            db.session.add(new_mac)
+            db.session.commit()
+
+        flash ('Mac Address has been updated!')
+        return redirect(url_for('student_add_mac'))
+    return render_template('studentaddmac.html', title='Student', form=form)
+
+@app.route('/attendance')
+@login_required
+def attendance():
+    form = AttendanceForm()
+    if form.validate_on_submit():
+        course_code = form.course_code.data
+        attendance_type = form.attendance_type.data
+        
+        if attendance_type == 'current': 
+            return render_template('display.php', course_code=course_code)
+        else: 
+            return redirect(url_for('getAttendance', course_code=course_code))
+
+    return render_template('attendance.html', title='Attendance', form=form)
 
 @app.route('/addcourse', methods=["POST"])
 def add_course():
@@ -109,7 +231,7 @@ def add_mac():
 def addReceiver():
     try:
         name = request.json['name']
-        # how to input with the location_id parameter? 
+        # have yet to input validation for the location --> check if location already exists in location table  
         location_temp = request.json["location"]
         location = db.session.query(Location).filter(Location.venue==location_temp).first()
         LID = location.id
@@ -194,24 +316,6 @@ def addreadings():
 
 #check if time is in Course[time] and day in Course[day] and Student in Course to get attendance
 
-@app.route('/student')
-def student():
-    return render_template('student.html', title='Home')
 
-@app.route('/post_student', methods=['POST'])
-def post_student():
-    student = Student(request.form['name'], request.form['email'])
-    
-    db.session.add(student)
-    db.session.commit()
-    return redirect(url_for('student')) 
-
-
-# @app.route('/post_admin', methods=['POST'])
-# def post_admin():
-#     course = Class(request.form['course_code'], request.form['student_name'], request.form['student_email'], request.form['group'], request.form['start_time'], request.form['end_time'])
-#     db.session.add(course)
-#     db.session.commit()
-#     return redirect(url_for('admin')) 
 
 
