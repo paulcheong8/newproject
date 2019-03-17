@@ -421,30 +421,32 @@ class Receiver(db.Model):
 #             'receiver_id': self.receiver_id
 #         }
 
-# class Attendance(db.Model):
-#     __tablename__ = 'attendance'
+class Attendance(db.Model):
+    __tablename__ = 'attendance'
 
-#     id = db.Column(db.Integer, primary_key=True) 
-#     status = db.Column(db.String(120), unique=False, nullable=False)
-#     # Foreign keys with student_course table 
-#     student_id = db.Column(db.Integer, db.ForeignKey('student.id'), nullable=False) 
-#     course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False) 
+    id = db.Column(db.Integer, primary_key=True) 
+    status = db.Column(db.String(120), unique=False, nullable=False)
+    student_id = db.Column(db.String(120), unique=False, nullable=False)
+    course_id = db.Column(db.String(120), unique=False, nullable=False)
+    # student_id = db.Column(db.Integer, db.ForeignKey('student.id'), nullable=False)
+    # student = db.relationship('student_course_table', back_populates='attendance_student')
+    # course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False) 
 
-#     def __init__(self, status, student_id, course_id):
-#         self.status
-#         self.student_id = student_id
-#         self.course_id = course_id
+    def __init__(self, status, student_id, course_id):
+        self.status
+        self.student_id = student_id
+        self.course_id = course_id
 
-#     def __repr__(self):
-#         return '<Attendance {}>'.format(self.id)
+    def __repr__(self):
+        return '<Attendance {}>'.format(self.id)
 
-#     def serialize(self): 
-#         return { 
-#             'id': self.id, 
-#             'status': self.status,
-#             'student_id': self.student_id,
-#             'course_id': self.course_id
-#         }
+    def serialize(self): 
+        return { 
+            'id': self.id, 
+            'status': self.status,
+            'student_id': self.student_id,
+            'course_id': self.course_id
+        }
 
 @login.user_loader
 def load_user(id):
