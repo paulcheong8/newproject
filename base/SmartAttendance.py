@@ -1,11 +1,42 @@
+import os, subprocess, requests, datetime
+from subprocess import call
 from app import app, db
 from app.models import Admin
-from datetime import datetime
 
 @app.shell_context_processor
 def make_shell_context():
     return {'db': db, 'Admin': Admin}
 
+# ############################JOB############################################
+# def post_info(result):
+#     url_base = "{}/updateMAC"
+#     for i in result:
+#         params = {"mac" : i}
+#         r = requests.post(url_base, json = params)
+
+# prev = datetime.datetime.now()
+# prev = prev.minute
+# first = False
+# while True:
+#         curr = datetime.datetime.now()
+#         curr = curr.minute
+#         if prev > curr:
+#                 time_difference = 60-prev+curr
+#         else:
+#                 time_difference = curr-prev
+#         if time_difference >= 10 or first == False:
+#                 output = subprocess.check_output(["sudo", "arp-scan", "--ignoredups", "-I", "wlan0", "--localnet"])
+#                 output = output.decode("utf-8").splitlines()
+#                 result = []
+#                 for line in output:
+#                         if "\t" in line:
+#                             line = line.split("\t")
+#                             result.append(line[1])
+                            
+#                 post_info(result)
+#                 prev = curr
+#                 first = True
+# #########################################################
 # while True:
 #     current_time = datetime.datetime.now()
 
