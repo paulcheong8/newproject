@@ -1,7 +1,7 @@
 from app import app
 from flask import render_template, request, redirect, url_for, flash, jsonify
 from app import db
-from app.models import Student, Course, Admin, Mac, Location, Receiver
+from app.models import Student, Course, Admin, Mac, Location, Receiver, Attendance
 from app.forms import LoginForm, AdminForm
 from flask_login import current_user, login_user, logout_user
 
@@ -124,6 +124,8 @@ def addReceiver():
 def addreadings():
     try:
         student_mac_dict = {} #get a dictionary that can store SID : mac address
+        instances_required = 12 #depending on lesson duration
+        cid = 1 #cid of course
         macs = Mac.query.all()
         for m in macs: 
             mac_address = m.mac_address 
@@ -151,6 +153,14 @@ def addreadings():
                 else:
                     attendance[sid] += 1
 
+        attendance_recorded = []
+        for sid,count in attendance:
+            if count >= instances_required:
+                if sid not in attendance_recorded:
+                    new_attendance = Attendance(status="Present", student_id=sid, course_id=cid)
+                    db.session.add(new_attendance)
+                    db.session.commit()
+                    attendance_recorded.append(sid)
         live_output = {
             "course_group" : "",
             "time" : "",

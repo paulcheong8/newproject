@@ -5,29 +5,29 @@
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
 <?php
-$student_dict = [
-    'course_group' => 'SMT203 G1',
-    'time' => '3:30',
-    'student_id' => [
-        1, 2, 3
-    ],
-    'student_names' => [
-        'Boon Hui Chiann',
-        'Daryl Ang Jun Hao',
-        'Paul Cheong Yi Wei'
-    ],
-    'email' => [
-        'hcboon.2017@sis.smu.edu.sg',
-        'daryl.ang.2017@sis.smu.edu.sg',
-        'paul.cheong.2017@sis.smu.edu.sg'
-    ],
-    'attendance' => [
-        1 => 5,
-        2 => 7,
-        3 => 2
-    ]
-];
-
+// $student_dict = [
+//     'course_group' => 'SMT203 G1',
+//     'time' => '3:30',
+//     'student_id' => [
+//         1, 2, 3
+//     ],
+//     'student_names' => [
+//         'Boon Hui Chiann',
+//         'Daryl Ang Jun Hao',
+//         'Paul Cheong Yi Wei'
+//     ],
+//     'email' => [
+//         'hcboon.2017@sis.smu.edu.sg',
+//         'daryl.ang.2017@sis.smu.edu.sg',
+//         'paul.cheong.2017@sis.smu.edu.sg'
+//     ],
+//     'attendance' => [
+//         1 => 5,
+//         2 => 7,
+//         3 => 2
+//     ]
+// ];
+$student_dict = {{student_dict}}
 ?>
 <h5>Course: <?= $student_dict['course_group'] ?></h5>
 <h5>Time: <?= $student_dict['time']?> </h5> 
