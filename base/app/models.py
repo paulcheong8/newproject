@@ -245,7 +245,7 @@ class StudentLogin(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
 
     def __repr__(self):
-        return '<Student Login {}>'.format(self.email)
+        return '<Student Login   {}>'.format(self.email)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

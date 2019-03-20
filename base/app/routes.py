@@ -22,9 +22,9 @@ def login():
     if form.validate_on_submit():
         admin = Admin.query.filter_by(email=form.username.data).first()
         student = StudentLogin.query.filter_by(email=form.username.data).first()
-        print (admin is None)
-        print (student is not None)
-        print (not student.check_password(form.password.data))
+        # print (admin is None)
+        # print (student is not None)
+        # print (not student.check_password(form.password.data))
         # print (student.check_password(form.password.data) == True)
         if (admin is None or not admin.check_password(form.password.data)) and (student is None or not student.check_password(form.password.data)):
             flash('Invalid email or password')
@@ -172,7 +172,7 @@ def attendance():
 
     return render_template('attendance.html', title='Attendance', form=form)
 
-@app.route('/addcourse', methods=["POST"])
+@app.route('/addcourse', methods=["POST"]) # tested and working 
 def add_course():
     course_code = request.json["course_code"]
     emails = request.json["emails"]
@@ -183,8 +183,6 @@ def add_course():
     end_date = request.json['end_date']
     location = request.json["location"]
     try:
-        # query if the location already exists then:
-        # Location.query.filter_by(venue=location).first() == True
         if db.session.query(Location).filter(Location.venue==location).first() == True:
             new_location = db.session.query(Location).filter(Location.venue==location).first() 
 
@@ -210,7 +208,7 @@ def add_course():
     except Exception as e:
         return (str(e))
 
-@app.route('/updateMAC', methods=["POST","PUT"])
+@app.route('/updateMAC', methods=["POST","PUT"]) # tested and working
 def add_mac():
     try:
         mac_addresses = request.json['mac_addresses']
@@ -227,14 +225,20 @@ def add_mac():
     except Exception as e:
         return (str(e))
 
-@app.route('/addReceiver', methods=['POST'])
+@app.route('/addReceiver', methods=['POST']) # tested and working  
 def addReceiver():
     try:
         name = request.json['name']
-        # have yet to input validation for the location --> check if location already exists in location table  
-        location_temp = request.json["location"]
-        location = db.session.query(Location).filter(Location.venue==location_temp).first()
-        LID = location.id
+        location = request.json["location"]
+        if db.session.query(Location).filter(Location.venue==location).first() == True:
+            location = db.session.query(Location).filter(Location.venue==location).first() 
+            LID = location.id
+        else: 
+            new_location = Location(venue=location)
+            db.session.add(new_location)
+            db.session.commit()
+            LID = new_location.id
+
         new_receiver = Receiver(name=name, location_id=LID)
         db.session.add(new_receiver)
         db.session.commit()
