@@ -1,7 +1,7 @@
 from app import app
 from flask import render_template, request, redirect, url_for, flash, jsonify
 from app import db
-from app.models import Student, Course, Admin, Mac, Location, Receiver, Attendance, StudentLogin
+from app.models import Student, Course, Admin, Mac, Location, Receiver, Attendance, StudentLogin, AttendanceTemp
 from app.forms import LoginForm, AdminForm, StudentForm, ReceiverForm, AttendanceForm
 from flask_login import current_user, login_user, logout_user, login_required
 
@@ -275,21 +275,25 @@ def addreadings():
                 else:
                     attendance[sid] += 1
 
-        attendance_recorded = []
         for sid,count in attendance:
             if count >= instances_required:
-                if sid not in attendance_recorded:
-                    new_attendance = Attendance(status="Present", student_id=sid, course_id=cid)
-                    db.session.add(new_attendance)
-                    db.session.commit()
-                    attendance_recorded.append(sid)
-        live_output = {
+                new_attendance = Attendance(status="Present", student_id=sid, course_id=cid)
+                db.session.add(new_attendance)
+                db.session.commit()
+            else:
+                tempattendance = AttendanceTemp(count=count, student_id=sid, course_id=cid)
+                db.session.add(tempattendance)
+                db.sessio.commmit()
+
+        live_output = jsonify({
             "course_group" : "",
             "time" : "",
+            "student_id" : student_id,
             "student_names" : student_name,
             "email": student_email,
             "attendance": attendance
-        }
+        })
+        
         #send -> location, student_id, student_name, student_email, attendance
         return render_template("display.php",student_dict = live_output)
     except Exception as e:
