@@ -267,7 +267,13 @@ def addreadings():
             student_email.append(semail)
         
         reciever_output = request.json['macs'] #retrieve data from job
+        attendancetemp = AttendanceTemp.query.all()
         attendance = {}
+        for temp in attendancetemp: # if there is no entries will initialize to an empty dict
+            sid = temp.student_id
+            count = temp.count
+            attendance[sid] = count
+        
         for sid,mac in student_mac_dict:
             if mac in reciever_output:
                 if sid not in attendance:
