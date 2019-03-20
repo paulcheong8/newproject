@@ -22,9 +22,9 @@ def login():
     if form.validate_on_submit():
         admin = Admin.query.filter_by(email=form.username.data).first()
         student = StudentLogin.query.filter_by(email=form.username.data).first()
-        print (admin is None)
-        print (student is not None)
-        print (not student.check_password(form.password.data))
+        # print (admin is None)
+        # print (student is not None)
+        # print (not student.check_password(form.password.data))
         # print (student.check_password(form.password.data) == True)
         if (admin is None or not admin.check_password(form.password.data)) and (student is None or not student.check_password(form.password.data)):
             flash('Invalid email or password')
