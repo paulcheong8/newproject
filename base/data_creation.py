@@ -12,7 +12,7 @@ s.set_password('123456')
 db.session.add(s)
 db.session.commit()
 
-
+print("ok!")
 
 # l = Location(venue='CR-3-3')
 # db.session.add(l)

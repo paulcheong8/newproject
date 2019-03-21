@@ -315,28 +315,3 @@ def addreadings():
         return render_template("display.php",student_dict = live_output)
     except Exception as e:
         return (str(e))
-
-# @app.route('/getAttendance', methods=['GET'])
-# def getAttendance():
-
-# @app.route('/createReadings', methods=['POST'])
-# def createReadings():
-#     try:
-#         # time_stamp = request.json['time_stamp']
-#         mac_address = request.json['mac_address']
-#         # check if mac_address exists in Mac.query.all()
-#         new_reading = Readings(mac_address=mac_address, time_stamp=time_stamp)
-#         #check if receiver_id exists in the Receiver table 
-#         # how to get get the receiver_id parameter? 
-#         db.session.add(new_reading)
-#         db.session.commit()
-#         return jsonify("{} was created".format(new_reading))
-
-#     except Exception as e:
-#         return (str(e))
-
-#check if time is in Course[time] and day in Course[day] and Student in Course to get attendance
-
-
-
-
