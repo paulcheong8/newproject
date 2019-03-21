@@ -1,9 +1,10 @@
 from app import app
-from flask import render_template, request, redirect, url_for, flash, jsonify
+from flask import render_template, request, redirect, url_for, flash, jsonify, json
 from app import db
 from app.models import Student, Course, Admin, Mac, Location, Receiver, Attendance, StudentLogin, AttendanceTemp
 from app.forms import LoginForm, AdminForm, StudentForm, ReceiverForm, AttendanceForm
 from flask_login import current_user, login_user, logout_user, login_required
+import requests
 
 
 @app.route('/')
@@ -107,7 +108,7 @@ def updateInformation():
         return redirect(url_for('updateInformation'))
     return render_template('updateinformation.html', title='Admin', form=form)
 
-@app.route('/admin/addReceiver', methods=['GET', 'POST'])
+@app.route('/admin/addReceiver', methods=['GET', 'POST']) # tested and working 
 @login_required
 def admin_add_receiver():
     form = ReceiverForm()
@@ -130,9 +131,57 @@ def admin_add_receiver():
 
         flash ('Receiver has been updated!')
         return redirect(url_for('admin_add_receiver'))
-    return render_template('adminaddreceiver.html', title='Admin', form=form)        
+    return render_template('adminaddreceiver.html', title='Admin', form=form)      
+#
+# @app.route('/admin/addReceiver', methods=['GET','POST']) # tested and working 
+# @login_required
+# def admin_add_receiver():
+#     form = ReceiverForm()
+#     if form.validate_on_submit():
+#         name = form.name.data
+#         location = form.location.data
+#         if db.session.query(Location).filter(Location.venue==location).first() == True:
+#             location = db.session.query(Location).filter(Location.venue==location).first() 
+#             LID = location.id
+#         else: 
+#             new_location = Location(venue=location)
+#             db.session.add(new_location)
+#             db.session.commit()
+#             LID = new_location.id
 
+#         new_receiver = Receiver(name=name, location_id=LID)
+#         db.session.add(new_receiver)
+#         db.session.commit()
 
+#         flash ('Receiver has been updated!')
+#         # r = requests.post("http://127.0.0.1:5000/addReceiver", json ={"name":name, "location":location})
+#         # return redirect(url_for('addReceiver', name=name, location=location))
+#         return r.json()
+#     return render_template('adminaddreceiver.html', title='Admin', form=form)    
+
+@app.route('/addReceiver', methods=['GET','POST']) # tested and working  
+def addReceiver():
+    try:
+        name = request.json['name']
+        print (name)
+        location = request.json["location"]
+        if db.session.query(Location).filter(Location.venue==location).first() == True:
+            location = db.session.query(Location).filter(Location.venue==location).first() 
+            LID = location.id
+        else: 
+            new_location = Location(venue=location)
+            db.session.add(new_location)
+            db.session.commit()
+            LID = new_location.id
+
+        new_receiver = Receiver(name=name, location_id=LID)
+        db.session.add(new_receiver)
+        db.session.commit()
+        redirect(url_for('admin_add_receiver'))
+        return jsonify("{} was created".format(new_receiver))
+    except Exception as e:
+        redirect(url_for('admin_add_receiver'))
+        return (str(e))
 
 @app.route('/student')
 @login_required
@@ -227,26 +276,7 @@ def add_mac():
     except Exception as e:
         return (str(e))
 
-@app.route('/addReceiver', methods=['POST']) # tested and working  
-def addReceiver():
-    try:
-        name = request.json['name']
-        location = request.json["location"]
-        if db.session.query(Location).filter(Location.venue==location).first() == True:
-            location = db.session.query(Location).filter(Location.venue==location).first() 
-            LID = location.id
-        else: 
-            new_location = Location(venue=location)
-            db.session.add(new_location)
-            db.session.commit()
-            LID = new_location.id
 
-        new_receiver = Receiver(name=name, location_id=LID)
-        db.session.add(new_receiver)
-        db.session.commit()
-        return jsonify("{} was created".format(new_receiver))
-    except Exception as e:
-        return (str(e))
 
 @app.route('/addReadings', methods =['POST'])
 def addreadings():
@@ -260,10 +290,11 @@ def addreadings():
 
         macs = Mac.query.all()
         for m in macs: 
-            mac_address = m.mac_address 
+            mac_address = str(m.mac_address)
             student_id = m.student_id
             student_mac_dict[student_id] = mac_address
             
+        
         student_id = []
         student_name = []
         student_email = []
@@ -275,32 +306,43 @@ def addreadings():
             student_name.append(sname)
             semail = s.email
             student_email.append(semail)
-        
+
         reciever_output = request.json['macs'] #retrieve data from job
         attendancetemp = AttendanceTemp.query.all()
         attendance = {}
         for temp in attendancetemp: # if there is no entries will initialize to an empty dict
-            sid = temp.student_id
+            sid = str(temp.student_id)
             count = temp.count
             attendance[sid] = count
         
-        for sid,mac in student_mac_dict:
+        print(attendance)
+        
+        for sid,mac in student_mac_dict.items():
             if mac in reciever_output:
-                if sid not in attendance:
-                    attendance[sid] = 1
+                if str(sid) not in attendance:
+                    attendance[str(sid)] = 1
                 else:
-                    attendance[sid] += 1
+                    attendance[str(sid)] += 1
 
-        for sid,count in attendance:
+        print(attendance)
+        
+        for sid,count in attendance.items():
             if count >= instances_required:
-                new_attendance = Attendance(status="Present", student_id=sid, course_id=cid)
-                db.session.add(new_attendance)
-                db.session.commit()
+                if not db.session.query(db.exists().where(Attendance.student_id == str(sid))).scalar():
+                    new_attendance = Attendance(status="Present", student_id=sid, course_id=cid)
+                    db.session.add(new_attendance)
+                    db.session.commit()
             else:
-                tempattendance = AttendanceTemp(count=count, student_id=sid, course_id=cid)
-                db.session.add(tempattendance)
-                db.sessio.commmit()
-
+                if db.session.query(db.exists().where(AttendanceTemp.student_id == str(sid))).scalar():
+                    row = db.session.query(AttendanceTemp).filter(AttendanceTemp.student_id==sid).first()
+                    print (row.count)
+                    row.count = count
+                    db.session.commit()
+                else:
+                    tempattendance = AttendanceTemp(count=count, student_id=sid, course_id=cid)
+                    db.session.add(tempattendance)
+                    db.session.commit()
+       
         live_output = jsonify({
             "course_group" : course_group,
             "time" : time,
@@ -315,3 +357,55 @@ def addreadings():
         return render_template("display.php",student_dict = live_output)
     except Exception as e:
         return (str(e))
+
+@app.route('/displayLiveAttendance', methods =['GET'])
+def displayLiveAttendance():
+    week = "week01" #depending on start date of course
+    course_group = "SMT201 G1"
+    time = "1200H"
+
+    student_id = []
+    student_name = []
+    student_email = []
+    students = Student.query.all()
+    for s in students:
+        sid = s.id
+        student_id.append(sid)
+        sname = str(s.name)
+        student_name.append(sname)
+        semail = str(s.email)
+        student_email.append(semail)
+
+    attendancetemp = AttendanceTemp.query.all()
+    attendance = {}
+    for temp in attendancetemp: # if there is no entries will initialize to an empty dict
+        sid = str(temp.student_id)
+        count = temp.count
+        attendance[sid] = count
+
+    live_output = {
+        "course_group" : course_group,
+        "time" : time,
+        # "week" : week,
+        "student_id" : student_id,
+        "student_names" : student_name,
+        "email": student_email,
+        "attendance": attendance
+        }
+    
+    print(live_output)
+
+    # fp = open('/tmp/live_output', 'w+')
+    # live_output = dict(json.dump(fp, live_output))
+
+    live_output = json.dumps(live_output)
+    print (type(live_output))
+
+    return render_template(
+        "display.php",
+        course_group=course_group,
+        time=time,
+        student_id=student_id,
+        student_name=student_name,
+        student_email=student_email,
+        attendance=attendance)

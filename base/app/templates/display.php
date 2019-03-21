@@ -5,32 +5,21 @@
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
 <?php
-// $student_dict = [
-//     'course_group' => 'SMT203 G1',
-//     'time' => '3:30',
-//     'student_id' => [
-//         1, 2, 3
-//     ],
-//     'student_names' => [
-//         'Boon Hui Chiann',
-//         'Daryl Ang Jun Hao',
-//         'Paul Cheong Yi Wei'
-//     ],
-//     'email' => [
-//         'hcboon.2017@sis.smu.edu.sg',
-//         'daryl.ang.2017@sis.smu.edu.sg',
-//         'paul.cheong.2017@sis.smu.edu.sg'
-//     ],
-//     'attendance' => [
-//         1 => 5,
-//         2 => 7,
-//         3 => 2
-//     ]
-// ];
-$student_dict = {{student_dict}}
+
+$course_group={{course_group}};
+$time={{time}};
+$student_id={{student_id}};
+$student_name={{student_name}};
+$student_email={{student_email}};
+$attendance={{attendance}};
+
+print_r($student_email);
+echo $course_group;
+echo"hi";
+
 ?>
-<h5>Course: <?= $student_dict['course_group'] ?></h5>
-<h5>Time: <?= $student_dict['time']?> </h5> 
+<h5>Course: <?= $course_group ?></h5>
+<h5>Time: <?= $time?> </h5> 
 <table class="table table-hover">
   <thead class ='thead-light'>
     <tr>
@@ -41,11 +30,11 @@ $student_dict = {{student_dict}}
   </thead>
   <tbody>
     <?php
-    foreach ($student_dict['student_id'] as $id ) {
+    foreach ($student_id as $id ) {
         $curr_id = $id-1;
-        $name = $student_dict['student_names'][$curr_id];
-        $email = $student_dict['email'][$curr_id];
-        $attendance = $student_dict['attendance'][$id];
+        $name = $student_names[$curr_id];
+        $email = $email[$curr_id];
+        $attendance = $attendance[$id];
         if ($attendance > 3) {
             echo "<tr bgcolor='#90EE90'>
                 <td>$name</td>
