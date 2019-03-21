@@ -116,14 +116,14 @@ def admin_add_receiver():
         location = form.location.data
         # check if Receiver is already in the location
         if db.session.query(Location).filter(Location.venue==location).first() == True:
-            new_location = db.session.query(Location).filter(Location.venue==location).first() 
-
+            location = db.session.query(Location).filter(Location.venue==location).first() 
+            LID = location.id
         else: 
             new_location = Location(venue=location)
             db.session.add(new_location)
             db.session.commit()
+            LID = new_location.id
 
-        LID = location.id
         new_receiver = Receiver(name=name, location_id=LID)
         db.session.add(new_receiver)
         db.session.commit()
@@ -131,6 +131,8 @@ def admin_add_receiver():
         flash ('Receiver has been updated!')
         return redirect(url_for('admin_add_receiver'))
     return render_template('adminaddreceiver.html', title='Admin', form=form)        
+
+
 
 @app.route('/student')
 @login_required
