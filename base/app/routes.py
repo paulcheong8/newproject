@@ -4,7 +4,8 @@ from app import db
 from app.models import Student, Course, Admin, Mac, Location, Receiver, Attendance, StudentLogin, AttendanceTemp
 from app.forms import LoginForm, AdminForm, StudentForm, ReceiverForm, AttendanceForm
 from flask_login import current_user, login_user, logout_user, login_required
-import requests
+from werkzeug.utils import secure_filename
+import requests, os
 
 
 @app.route('/')
@@ -15,18 +16,11 @@ import requests
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    # if current_user.is_authenticated:
-    #     return redirect(url_for('login'))
 
     form = LoginForm()
-    # login validation for admin
     if form.validate_on_submit():
         admin = Admin.query.filter_by(email=form.username.data).first()
         student = StudentLogin.query.filter_by(email=form.username.data).first()
-        # print (admin is None)
-        # print (student is not None)
-        # print (not student.check_password(form.password.data))
-        # print (student.check_password(form.password.data) == True)
         if (admin is None or not admin.check_password(form.password.data)) and (student is None or not student.check_password(form.password.data)):
             flash('Invalid email or password')
             return redirect(url_for('login'))
@@ -36,17 +30,6 @@ def login():
         elif student is not None and student.check_password(form.password.data) == True:
             login_user(student, remember=form.remember_me.data)
             return redirect(url_for('student'))
-        
-    # login validation for student
-    # if form.validate_on_submit():
-    #     student = StudentLogin.query.filter_by(email=form.username.data).first()
-
-    #     if student is None or not student.check_password(form.password.data):
-    #         flash('Invalid email or password')
-    #         return redirect(url_for('login'))
-
-    #     login_user(student, remember=form.remember_me.data)
-    #     return redirect(url_for('student'))
 
     return render_template('login.html', title='Sign In', form=form)
 
@@ -60,7 +43,7 @@ def logout():
 def admin():
     return render_template('admin.html', title='Admin')
 
-@app.route('/admin/updateinformation', methods=['GET', 'POST'])
+@app.route('/admin/updateinformation', methods=['GET', 'POST']) # tested and working 
 @login_required
 def updateInformation():
     form = AdminForm()
@@ -75,19 +58,21 @@ def updateInformation():
 
         student_array = []
         student_details = form.student_details.data
-        with open(student_details, 'r') as f:
-            for line in f:
-                x = line.rstrip()
-                x = x.split(',')
-                new_email = x[0]
-                new_name = x[1]
-                new_student = Student(email=new_email, name=new_name)
-                db.session.add(new_student)
-                student_array.append(new_student)
+        filename = secure_filename(student_details.filename)
+        contents = student_details.read()
+
+        contents_stripped = contents.rstrip("\r\n")
+        contents_split = contents_stripped.split("\r\n")
+        for content in contents_split:
+            data = content.split(",")
+            new_name = data[0]
+            new_email = data[1]
+            new_student = Student(email=new_email, name=new_name)
+            db.session.add(new_student)
+            student_array.append(new_student)
 
         if db.session.query(Location).filter(Location.venue==location).first() == True:
             new_location = db.session.query(Location).filter(Location.venue==location).first() 
-
         else: 
             new_location = Location(venue=location)
             db.session.add(new_location)
@@ -115,7 +100,7 @@ def admin_add_receiver():
     if form.validate_on_submit():
         name = form.name.data
         location = form.location.data
-        # check if Receiver is already in the location
+
         if db.session.query(Location).filter(Location.venue==location).first() == True:
             location = db.session.query(Location).filter(Location.venue==location).first() 
             LID = location.id
@@ -131,33 +116,7 @@ def admin_add_receiver():
 
         flash ('Receiver has been updated!')
         return redirect(url_for('admin_add_receiver'))
-    return render_template('adminaddreceiver.html', title='Admin', form=form)      
-#
-# @app.route('/admin/addReceiver', methods=['GET','POST']) # tested and working 
-# @login_required
-# def admin_add_receiver():
-#     form = ReceiverForm()
-#     if form.validate_on_submit():
-#         name = form.name.data
-#         location = form.location.data
-#         if db.session.query(Location).filter(Location.venue==location).first() == True:
-#             location = db.session.query(Location).filter(Location.venue==location).first() 
-#             LID = location.id
-#         else: 
-#             new_location = Location(venue=location)
-#             db.session.add(new_location)
-#             db.session.commit()
-#             LID = new_location.id
-
-#         new_receiver = Receiver(name=name, location_id=LID)
-#         db.session.add(new_receiver)
-#         db.session.commit()
-
-#         flash ('Receiver has been updated!')
-#         # r = requests.post("http://127.0.0.1:5000/addReceiver", json ={"name":name, "location":location})
-#         # return redirect(url_for('addReceiver', name=name, location=location))
-#         return r.json()
-#     return render_template('adminaddreceiver.html', title='Admin', form=form)    
+    return render_template('adminaddreceiver.html', title='Admin', form=form)         
 
 @app.route('/addReceiver', methods=['GET','POST']) # tested and working  
 def addReceiver():
@@ -188,21 +147,34 @@ def addReceiver():
 def student():
     return render_template('student.html', title='Home')
 
-@app.route('/student/addMac', methods=["GET", "POST"])
+@app.route('/student/addMac', methods=["GET", "POST"]) # tested and working 
 @login_required
 def student_add_mac():
     form = StudentForm()
     if form.validate_on_submit():
         mac_addresses = form.mac_addresses.data
         email = form.email.data
-        mac_addresses_array = mac_addresses.split(',')
+        name = form.name.data
+        if ',' in mac_addresses:
+            mac_addresses_array = mac_addresses.split(',')
+        else:
+            mac_addresses_array = [mac_addresses]
 
         for mac_address in mac_addresses_array: 
-            student = db.session.query(Student).filter(Student.email==email).first()
-            SID = student.id
-            new_mac = Mac(mac_address=mac_address, student_id=SID)
-            db.session.add(new_mac)
-            db.session.commit()
+            if db.session.query(db.exists().where(Student.email == email)).scalar():
+                student = db.session.query(Student).filter(Student.email==email).first()
+                SID = student.id
+                new_mac = Mac(mac_address=mac_address, student_id=SID)
+                db.session.add(new_mac)
+                db.session.commit()
+            else: 
+                new_student = Student(email=email, name=name)
+                db.session.add(new_student)
+                db.session.commit()
+                SID = new_student.id
+                new_mac = Mac(mac_address=mac_address, student_id=SID)
+                db.session.add(new_mac)
+                db.session.commit()
 
         flash ('Mac Address has been updated!')
         return redirect(url_for('student_add_mac'))

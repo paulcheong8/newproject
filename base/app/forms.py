@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, FileField, RadioField
 from wtforms.validators import DataRequired
-from flask_wtf.file import FileField, FileRequired
+from flask_wtf.file import FileField, FileRequired, FileAllowed
 from werkzeug.utils import secure_filename 
 
 class LoginForm(FlaskForm):
@@ -11,7 +11,7 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Sign In')
 
 class StudentForm(FlaskForm):
-    #name = StringField('Name', validators=[DataRequired()])
+    name = StringField('Name', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired()])
     mac_addresses = StringField('Mac Address', validators=[DataRequired()])
     submit = SubmitField('Add')
@@ -23,7 +23,7 @@ class ReceiverForm(FlaskForm):
     
 class AdminForm(FlaskForm):
     course_code = StringField('Course Code', validators=[DataRequired()])
-    student_details = FileField(validators=[FileRequired()])
+    student_details = FileField(validators=[FileRequired(), FileAllowed(['csv'], 'CSV files only!')])
     start_time = StringField('Start Time', validators=[DataRequired()])
     end_time = StringField('End Time', validators=[DataRequired()])
     start_date = StringField('Start Date', validators=[DataRequired()])
