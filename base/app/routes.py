@@ -252,6 +252,10 @@ def addreadings():
         student_mac_dict = {} #get a dictionary that can store SID : mac address
         instances_required = 12 #depending on lesson duration
         cid = 1 #cid of course
+        week = "week01" #depending on start date of course
+        course_group = "SMT201 G1"
+        time = "1200H"
+
         macs = Mac.query.all()
         for m in macs: 
             mac_address = m.mac_address 
@@ -296,8 +300,9 @@ def addreadings():
                 db.sessio.commmit()
 
         live_output = jsonify({
-            "course_group" : "",
-            "time" : "",
+            "course_group" : course_group,
+            "time" : time,
+            "week" : week,
             "student_id" : student_id,
             "student_names" : student_name,
             "email": student_email,
