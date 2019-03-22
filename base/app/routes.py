@@ -56,18 +56,23 @@ def updateInformation():
 
         student_array = []
         student_details = form.student_details.data
-        filename = secure_filename(student_details.filename)
+        # filename = secure_filename(student_details.filename)
         contents = student_details.read()
 
         contents_stripped = contents.rstrip("\r\n")
         contents_split = contents_stripped.split("\r\n")
+        first_row = True
         for content in contents_split:
-            data = content.split(",")
-            new_name = data[0]
-            new_email = data[1]
-            new_student = Student(email=new_email, name=new_name)
-            db.session.add(new_student)
-            student_array.append(new_student)
+            if first_row == True:
+                first_row = False
+            else: 
+                data = content.split(",")
+                new_name = data[0]
+                new_email = data[1]
+                if not db.session.query(db.exists().where(Student.email == new_email)).scalar():
+                    new_student = Student(email=new_email, name=new_name)
+                    db.session.add(new_student)
+                    student_array.append(new_student)
 
         if db.session.query(Location).filter(Location.venue==location).first() == True:
             new_location = db.session.query(Location).filter(Location.venue==location).first() 
