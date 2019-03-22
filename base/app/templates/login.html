@@ -1,18 +1,14 @@
-{% extends "bootstrap/base.html" %}
-{% import "bootstrap/wtf.html" as wtf %}
+{% extends "base.html" %}
 
 {% block title %}
 SmartAttendance
 {% endblock %}
-
 {% block content %}
-<div class='container'>
+
     <h1>Sign In</h1>
     <form action="" method="post" novalidate>
-        <dl>
-                {{ wtf.quick_form(form) }}
-        </dl>
-        <!-- {{ form.hidden_tag() }}
+
+         {{ form.hidden_tag() }}
         <p>
             {{ form.username.label }}<br>
             {{ form.username(size=32) }}<br>
@@ -39,10 +35,9 @@ SmartAttendance
 
         </p>
         <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
-        <p>{{ form.submit() }}</p> -->
+        <p>{{ form.submit() }}</p>
 
 
     </form>
-</div>
 
 {% endblock %}

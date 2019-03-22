@@ -1,27 +1,24 @@
-
-
-<html>
-    <head>
-      {% if title %}
-      <title>{{ title }} - Smart Attendance</title>
-      {% else %}
-      <title>Welcome to Smart Attendance</title>
-      {% endif %}
-    </head>
-    <body>
-        <div>
-            <a href="/student">Student</a>
-            <a href="/admin">Admin</a>
-            {% if current_user.is_anonymous %}
-            <a href="{{ url_for('login') }}">Login</a>
-            {% else %}
-            <a href="{{ url_for('logout') }}">Logout</a>
-            {% endif %}
-            <a href="/attendance">Attendance</a> 
-            <!-- <a href="/login">Admin</a> -->
-        </div>
-
-        <hr>
-        {% block content %}{% endblock %}
-    </body>
-</html>
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block navbar %}
+<nav class="navbar navbar-expand-md navbar-light bg-info">
+    <span class="navbar-brand" ><a href="https://www.smu.edu.sg/" target='blank'>Smart Attendance</a></span>
+    <ul class="nav navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" href="/student">Student</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/admin">Admin</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/attendance">Attendance</a>
+        </li>
+    </ul>
+</nav>
+{% endblock %}
