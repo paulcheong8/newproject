@@ -5,8 +5,6 @@ from app.models import Student, Course, Admin, Mac, Location, Receiver, Attendan
 from app.forms import LoginForm, AdminForm, StudentForm, ReceiverForm, AttendanceForm
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.utils import secure_filename
-import requests, os
-
 
 @app.route('/')
 # @app.route('/index')
