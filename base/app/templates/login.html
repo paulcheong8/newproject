@@ -14,26 +14,28 @@ SmartAttendance
     <body>
     <div class="container-contact100">
         <div class="wrap-contact100">
-            <form action="" method="post" novalidate>
+            <form action="" method="post" class="contact100-form validate-form" novalidate >
                 <span class="contact100-form-title">
                         Smart Attendance
                 </span>
                 {{ form.hidden_tag() }}
                 
-                <div class="wrap-input100 validate-input">
-                    {{ form.username.label }}<br>
+                {{ form.username.label }}<br>
+                <div class="wrap-input100">                   
                     {{ form.username(size=32) }}<br>
                     {% for error in form.username.errors %}
                     <span style="color: red;">[{{ error }}]</span>
                     {% endfor %}
+                    <span class="focus-input100"></span>
                 </div>
                 
-                <div class="wrap-input100 validate-input">
-                    {{ form.password.label }}<br>
+                {{ form.password.label }}<br>
+                <div class="wrap-input100">                    
                     {{ form.password(size=32) }}<br>
                     {% for error in form.password.errors %}
                     <span style="color: red;">[{{ error }}]</span>
                     {% endfor %}
+                    <span class="focus-input100"></span>
                 </div>
         
                 {% with messages = get_flashed_messages() %}
@@ -52,7 +54,6 @@ SmartAttendance
                 <div class="container-contact100-form-btn">
                     <button class="contact100-form-btn">
                         <span>
-                            <i class="fa fa-paper-plane-o m-r-6" aria-hidden="true"></i>
                             {{ form.submit() }}
                         </span>
                     </button>
