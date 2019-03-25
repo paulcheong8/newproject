@@ -384,3 +384,6 @@ def displayLiveAttendance():
         student_name=student_name,
         student_email=student_email,
         attendance=attendance)
+
+if __name__ == '__main__':
+	app.run(debug=True)

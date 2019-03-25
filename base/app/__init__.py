@@ -7,7 +7,8 @@ from flask_bootstrap import Bootstrap
 
 app = Flask(__name__)
 Bootstrap(app)
-app.run(debug=True)
+if __name__ == '__main__':
+	app.run(debug=True)
 app.config.from_object(Config)
 db = SQLAlchemy(app)
 migrate = Migrate(app,db)
