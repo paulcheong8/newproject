@@ -1,3 +1,9 @@
+@font-face {
+    font-family: Ubuntu-Bold;
+    src: url('../fonts/ubuntu/Ubuntu-Bold.ttf'); 
+}
+
 .nav-link {
     color: white;
+    font-family: Ubuntu-Bold;
 }

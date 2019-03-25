@@ -1,3 +1,8 @@
+@font-face {
+    font-family: Ubuntu-Bold;
+    src: url('../fonts/ubuntu/Ubuntu-Bold.ttf'); 
+}
+
 .button {
     background-color: #008080;
     border-radius: 31px;
@@ -13,6 +18,7 @@
   
 .text{
     text-align:center;
+    font-family: Ubuntu-Bold;
     padding: 10px 5px 5px 5px;
 }
   
