@@ -15,12 +15,11 @@ SmartAttendance
     <div class="container-contact100">
         <div class="wrap-contact100">
             <form action="" method="post" class="contact100-form validate-form" novalidate >
-                <span class="contact100-form-title">
-                        Smart Attendance
-                </span>
                 {{ form.hidden_tag() }}
                 
+                <div class="label">
                 {{ form.username.label }}<br>
+                </div>
                 <div class="wrap-input100">                   
                     {{ form.username(size=32) }}<br>
                     {% for error in form.username.errors %}
@@ -29,7 +28,9 @@ SmartAttendance
                     <span class="focus-input100"></span>
                 </div>
                 
+                <div class="label">
                 {{ form.password.label }}<br>
+                </div>
                 <div class="wrap-input100">                    
                     {{ form.password(size=32) }}<br>
                     {% for error in form.password.errors %}

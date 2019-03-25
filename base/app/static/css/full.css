@@ -6,7 +6,7 @@
 
 body {
   /* https://www.nxt.group/wp-content/uploads/2016/04/gradient-background-26046-26731-hd-wallpapers.jpg.png */
-  background: url(https://i.stack.imgur.com/0ASXA.jpg) no-repeat center center fixed;
+  background: url(../img/smart_attendance_background.png) no-repeat center center fixed;
   /* background: url(../img/smu_background.jpg) no-repeat center center fixed; */
   -webkit-background-size: cover;
   -moz-background-size: cover;
