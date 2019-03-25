@@ -181,7 +181,11 @@ iframe {
   margin-bottom: 16px;
   position: relative;
   z-index: 1;
+<<<<<<< HEAD
   padding: 1em 1em;
+=======
+  padding: 1.5em 1em;
+>>>>>>> 371337d26ca87716e42f07a277ad9ac0a92b7507
 }
 
 .input100 {
