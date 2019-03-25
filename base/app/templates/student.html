@@ -1,15 +1,14 @@
 {% extends "base.html" %}
 
-
 {% block content %}
 <html>
     <head>
         <link rel="stylesheet" href="{{ url_for('static', filename='css/button.css') }}">
     </head>
     <body>
-    <a href="{{ url_for('student_add_mac') }}">Update Mac Addresses</a>
+    <a class="buttons" href="{{ url_for('student_add_mac') }}">Update Mac Addresses</a>
     <br>
-    <a href="{{ url_for('attendance') }}">View Attendance</a>
+    <a class="buttons" href="{{ url_for('attendance') }}">View Attendance</a>
     </body>
 </html>
 {% endblock %}

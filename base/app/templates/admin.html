@@ -6,11 +6,11 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='css/button.css') }}">
     </head>
     <body>
-    <a href="{{ url_for('updateInformation') }}">Update Information</a>
+    <a class="buttons" href="{{ url_for('updateInformation') }}">Update Information</a>
     <br>
-    <a href="{{ url_for('admin_add_receiver') }}">Add Receiver</a>
+    <a class="buttons" href="{{ url_for('admin_add_receiver') }}">Add Receiver</a>
     <br>
-    <a href="{{ url_for('attendance') }}">View Attendance</a>
+    <a class="buttons" href="{{ url_for('attendance') }}">View Attendance</a>
     </body>
 </html>
 {% endblock %}
