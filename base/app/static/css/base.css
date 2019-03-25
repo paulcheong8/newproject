@@ -1,3 +1,14 @@
+<<<<<<< HEAD
 .nav-link {
     color: white;
+=======
+@font-face {
+    font-family: Ubuntu-Bold;
+    src: url('../fonts/ubuntu/Ubuntu-Bold.ttf'); 
+}
+
+.nav-link {
+    color: white;
+    font-family: Ubuntu-Bold;
+>>>>>>> 4904000c8de23556e497b8e056db9390c62eb813
 }

@@ -1,2 +1,2 @@
-web: flask db upgrade; flask translate compile; gunicorn SmartAttendance:app;
+web: flask db upgrade; gunicorn SmartAttendance:app;
 

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% extends "base.html" %}
 
 {% block content %}
@@ -13,4 +14,45 @@
     <a class="buttons" href="{{ url_for('attendance') }}">View Attendance</a>
     </body>
 </html>
+=======
+{% extends "base.html" %}
+
+{% block content %}
+<html>
+    <head>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/button.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/backgroundother.css') }}">
+    </head>
+    <body>
+        <div class="container-contact100">
+            <div class="button">
+                <a class="buttons" href="{{ url_for('updateInformation') }}">
+                    <img src="{{ url_for('static', filename='img/add.png') }}">
+                </a>
+                <div class="text">
+                    Update Information
+                </div>
+            </div>
+            <div class="divider"></div>
+            <div class="button">
+                <a class="buttons" href="{{ url_for('admin_add_receiver') }}">
+                    <img src ="{{ url_for('static', filename='img/addreceiver.png') }}">
+                </a>
+                <div class="text">
+                    Add Receiver
+                </div>
+            </div>
+            <div class="divider"></div>
+            <div class="button">
+                <a class="buttons" href="{{ url_for('attendance') }}">
+                    <img src="{{ url_for('static', filename='img/view.png') }}">
+                </a>
+                <div class="text">
+                    View Attendance
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
+>>>>>>> 4904000c8de23556e497b8e056db9390c62eb813
 {% endblock %}

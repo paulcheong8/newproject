@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /*!
  * Start Bootstrap - Full (https://startbootstrap.com/template-overviews/full)
  * Copyright 2013-2017 Start Bootstrap
@@ -14,3 +15,21 @@ body {
   -o-background-size: cover;
 }
 /* url(https://i.stack.imgur.com/0ASXA.jpg) */
+=======
+/*!
+ * Start Bootstrap - Full (https://startbootstrap.com/template-overviews/full)
+ * Copyright 2013-2017 Start Bootstrap
+ * Licensed under MIT (https://github.com/BlackrockDigital/startbootstrap-full/blob/master/LICENSE)
+ */
+
+body {
+  /* https://www.nxt.group/wp-content/uploads/2016/04/gradient-background-26046-26731-hd-wallpapers.jpg.png */
+  background: url(../img/smart_attendance_background.png) no-repeat center center fixed;
+  /* background: url(../img/smu_background.jpg) no-repeat center center fixed; */
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  background-size: cover;
+  -o-background-size: cover;
+}
+/* url(https://i.stack.imgur.com/0ASXA.jpg) */
+>>>>>>> 4904000c8de23556e497b8e056db9390c62eb813
