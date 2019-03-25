@@ -176,6 +176,7 @@ iframe {
 .wrap-input100 {
   width: 100%;
   background-color: #fff;
+  /* background-color: #FF0000; */
   border-radius: 31px;
   margin-bottom: 16px;
   position: relative;
