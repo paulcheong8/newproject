@@ -176,11 +176,12 @@ iframe {
 .wrap-input100 {
   width: 100%;
   background-color: #fff;
+  /* background-color: #FF0000; */
   border-radius: 31px;
   margin-bottom: 16px;
   position: relative;
   z-index: 1;
-  padding: 2em 1.5em;
+  padding: 1em 1em;
 }
 
 .input100 {
