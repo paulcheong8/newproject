@@ -183,20 +183,6 @@ def student_add_mac():
         return redirect(url_for('student_add_mac'))
     return render_template('studentaddmac.html', title='Student', form=form)
 
-@app.route('/attendance')
-@login_required
-def attendance():
-    form = AttendanceForm()
-    if form.validate_on_submit():
-        course_code = form.course_code.data
-        attendance_type = form.attendance_type.data
-        
-        if attendance_type == 'current': 
-            return render_template('display.php', course_code=course_code)
-        else: 
-            return redirect(url_for('getAttendance', course_code=course_code))
-
-    return render_template('attendance.html', title='Attendance', form=form)
 
 @app.route('/addcourse', methods=["POST"]) # tested and working 
 def add_course():
@@ -251,6 +237,39 @@ def add_mac():
     except Exception as e:
         return (str(e))
 
+@app.route('/attendance', methods=["GET", "POST"])
+@login_required
+def attendance():
+    form = AttendanceForm()
+    if form.validate_on_submit():
+        course_code = form.course_code.data
+        attendance_type = form.attendance_type.data
+        # check if it is a valid course input from the user 
+        if db.session.query(db.exists().where(Course.course_code == course_code)).scalar():
+            course = db.session.query(Course).filter(Course.course_code==course_code).first() 
+            course_code = course.course_code
+            time = course.start_time
+            # course_id = course.id
+            if attendance_type == 'current': 
+                return redirect(url_for('displayLiveAttendance', course_code=course_code, time=time))
+
+                # return redirect(url_for('displayLiveAttendance', course_code=course_code, time=time))
+            else: 
+                return redirect(url_for('getAttendance', course_code=course_code, time=time))
+
+        else:
+            flash ('Please enter a valid course code!')
+            return render_template('attendance.html', title='Attendance', form=form)
+
+    return render_template('attendance.html', title='Attendance', form=form)
+
+# @app.route('/attendance/getAttendance', methods=['GET', 'POST'])
+# @login_required
+# def getAttendance(course):
+#     course_id = course.id
+#     attendance = Attendance.query.filter_by(course_id=course_id).all()
+
+     
 
 
 @app.route('/addReadings', methods =['POST'])
@@ -333,11 +352,13 @@ def addreadings():
     except Exception as e:
         return (str(e))
 
-@app.route('/displayLiveAttendance', methods =['GET'])
-def displayLiveAttendance():
+@app.route('/displayLiveAttendance/<course_code>/<time>', methods =['GET', 'POST'])
+def displayLiveAttendance(course_code,time):
     week = "week01" #depending on start date of course
-    course_group = "SMT201 G1"
-    time = "1200H"
+    # course_code = course.course_code
+    # course_code = request.json['course_code']
+    # time = request.json['time']
+    # time = course.start_time
 
     student_id = []
     student_name = []
@@ -359,7 +380,7 @@ def displayLiveAttendance():
         attendance[sid] = count
 
     live_output = {
-        "course_group" : course_group,
+        "course_code" : course_code,
         "time" : time,
         # "week" : week,
         "student_id" : student_id,
@@ -368,17 +389,17 @@ def displayLiveAttendance():
         "attendance": attendance
         }
     
-    print(live_output)
+    # print(live_output)
 
     # fp = open('/tmp/live_output', 'w+')
     # live_output = dict(json.dump(fp, live_output))
 
     live_output = json.dumps(live_output)
-    print (type(live_output))
-
+    # print (type(live_output))
+    
     return render_template(
-        "display.php",
-        course_group=course_group,
+        "display.html",
+        course_code=course_code,
         time=time,
         student_id=student_id,
         student_name=student_name,

@@ -34,5 +34,5 @@ class AdminForm(FlaskForm):
 
 class AttendanceForm(FlaskForm):
     course_code = StringField('Course', validators=[DataRequired()])
-    attendance_type = RadioField('Type', choices=[('current','Current'),('historical','Historical')])
+    attendance_type = RadioField('Type', choices=[('current','Current'),('overview','Overview')])
     submit = SubmitField('Search')
