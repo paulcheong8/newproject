@@ -248,14 +248,12 @@ def attendance():
         if db.session.query(db.exists().where(Course.course_code == course_code)).scalar():
             course = db.session.query(Course).filter(Course.course_code==course_code).first() 
             course_code = course.course_code
+            course_id = course.id
             time = course.start_time
-            # course_id = course.id
             if attendance_type == 'current': 
                 return redirect(url_for('displayLiveAttendance', course_code=course_code, time=time))
-
-                # return redirect(url_for('displayLiveAttendance', course_code=course_code, time=time))
             else: 
-                return redirect(url_for('getAttendance', course_code=course_code, time=time))
+                return redirect(url_for('AttendanceOverview', course_code=course_code, course_id=course_id))
 
         else:
             flash ('Please enter a valid course code!')
@@ -353,12 +351,11 @@ def addreadings():
         return (str(e))
 
 @app.route('/displayLiveAttendance/<course_code>/<time>', methods =['GET', 'POST'])
-def displayLiveAttendance(course_code,time):
+def displayLiveAttendance(course_code,course_id,time):
     week = "week01" #depending on start date of course
-    # course_code = course.course_code
-    # course_code = request.json['course_code']
-    # time = request.json['time']
-    # time = course.start_time
+
+    print (course_code)
+    print (time)
 
     student_id = []
     student_name = []
@@ -398,13 +395,34 @@ def displayLiveAttendance(course_code,time):
     # print (type(live_output))
     
     return render_template(
-        "display.html",
+        "displayLive.html",
         course_code=course_code,
         time=time,
         student_id=student_id,
         student_name=student_name,
         student_email=student_email,
         attendance=attendance)
+
+@app.route('/AttendanceOverview/<course_code>/<course_id>/', methods =['GET', 'POST'])
+def AttendanceOverview(course_code,course_id):
+    week = "week01" #depending on start date of course
+
+    student_name = []
+    student_email = []
+    attendance = Attendance.query.filter_by(course_id=course_id).all()
+    status = []
+    for i in range(len(attendance)):
+        student = Student.query.filter_by(id=attendance[i].student_id).first()
+        student_name.append(student.name)
+        student_email.append(student.email)
+        status.append(attendance[i].status)
+    
+    return render_template(
+        "displayOverview.html",
+        course_code=course_code,
+        student_name=student_name,
+        student_email=student_email,
+        status=status)
 
 if __name__ == '__main__':
 	app.run(debug=True)
