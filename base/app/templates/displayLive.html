@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{{ course_code}}
+
+<div class="card animate animated fadeInRight" style="width: 18rem;">
+    <div class="card-body">
+        <table class="table table-bordered table-dark">
+            <thead>
+              <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Email</th>
+                <th scope="col">Attendance</th>
+              </tr>
+            </thead>
+            <tbody>
+                {% for n in range(student_name| length) %}
+                <tr>
+                  <td>{{ student_name[n] }}</td>
+                  <td>{{ student_email[n] }}</td>
+                  <td>{{ attendance[n] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+    </table>
+    </div>
+</div>
+{% endblock %}
