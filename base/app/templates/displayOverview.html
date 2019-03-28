@@ -6,24 +6,32 @@
 
 <div class="card animate animated fadeInRight" style="width: 18rem;">
     <div class="card-body">
-        <table class="table table-bordered table-dark">
-            <thead>
+        <table class="table table-hover">
+            <thead class ='thead-light'>
               <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Email</th>
-                <th scope="col">Attendance</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Attendance</th>
               </tr>
             </thead>
             <tbody>
                 {% for n in range(student_name| length) %}
-                <tr>
-                  <td>{{ student_name[n] }}</td>
-                  <td>{{ student_email[n] }}</td>
-                  <td>{{ status[n] }}</td>
-                </tr>
+                  {% if attendance[n] > 12 %}
+                    <tr bgcolor='#90EE90'>
+                      <td>{{ student_name[n] }}</td>
+                      <td>{{ student_email[n] }}</td>
+                      <td>{{ attendance[n] }}</td>
+                    </tr>
+                  {% else %}
+                    <tr bgcolor='#FFA07A'>
+                      <td>{{ student_name[n] }}</td>
+                      <td>{{ student_email[n] }}</td>
+                      <td>{{ attendance[n] }}</td>
+                    </tr>
+                  {% end if %}
                 {% endfor %}
             </tbody>
-    </table>
+        </table>
     </div>
 </div>
 {% endblock %}
