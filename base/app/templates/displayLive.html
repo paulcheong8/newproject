@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<!-- {{ course_code}} -->
+{{ course_code}}
 
 <div class="card animate animated fadeInRight" style="width: 18rem;">
     <div class="card-body">
@@ -28,7 +28,7 @@
                       <td>{{ student_email[n] }}</td>
                       <td>{{ attendance[n] }}</td>
                     </tr>
-                  {% end if %}
+                  {% endif %}
                 {% endfor %}
             </tbody>
     </table>
