@@ -49,7 +49,7 @@ class Student(db.Model):
     # One to many relationship with Mac 
     addresses = db.relationship('Mac', back_populates='student', cascade='all', lazy=True, uselist=True)
     # Many to Many relationship with Course
-    courses = db.relationship('Course', secondary=student_course_table, lazy=True, back_populates='students')
+    courses = db.relationship('Course', secondary=student_course_table, lazy='joined', back_populates='students')
     
     def __init__(self, name, email, addresses=None, courses=None): 
         self.name = name 
@@ -104,7 +104,7 @@ class Course(db.Model):
     start_date = db.Column(db.String(120), unique=False, nullable=False)  
     end_date = db.Column(db.String(120), unique=False, nullable=False)  
     # Many to Many relationship with Student
-    students = db.relationship('Student', secondary=student_course_table, lazy=True, back_populates='courses')
+    students = db.relationship('Student', secondary=student_course_table, lazy='joined', back_populates='courses')
     # Many to one relationship with Location
     location_id = db.Column(db.Integer, db.ForeignKey('location.id'), nullable=False) 
     location = db.relationship('Location', back_populates='course')
