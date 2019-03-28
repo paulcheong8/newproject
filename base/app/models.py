@@ -219,10 +219,13 @@ class Attendance(db.Model):
     status = db.Column(db.String(120), unique=False, nullable=False)
     student_id = db.Column(db.String(120), unique=False, nullable=False)
     course_id = db.Column(db.String(120), unique=False, nullable=False)
-    def __init__(self, status, student_id, course_id):
+    week = db.Column(db.String(120), unique=False, nullable=False)
+
+    def __init__(self, status, student_id, course_id, week):
         self.status = status
         self.student_id = student_id
         self.course_id = course_id
+        self.week = week
 
     def __repr__(self):
         return '<Attendance {}>'.format(self.id)
@@ -232,7 +235,8 @@ class Attendance(db.Model):
             'id': self.id, 
             'status': self.status,
             'student_id': self.student_id,
-            'course_id': self.course_id
+            'course_id': self.course_id,
+            'week' : self.week
         }
 
 @login.user_loader

@@ -5,12 +5,11 @@ from app.models import Student, Course, Admin, Mac, Location, Receiver, Attendan
 from app.forms import LoginForm, AdminForm, StudentForm, ReceiverForm, AttendanceForm
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.utils import secure_filename
+from datetime import datetime, timedelta
 
 @app.route('/')
-# @app.route('/index')
-# def index():
-#     user = {'username': 'Paul'}
-#     return render_template('index.html', user=user)
+def index():
+    return redirect(url_for('login'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -104,7 +103,7 @@ def admin_add_receiver():
         name = form.name.data
         location = form.location.data
 
-        if db.session.query(Location).filter(Location.venue==location).first() == True:
+        if db.session.query(db.exists().where(Location.venue==location)).scalar():
             location = db.session.query(Location).filter(Location.venue==location).first() 
             LID = location.id
         else: 
@@ -127,7 +126,8 @@ def addReceiver():
         name = request.json['name']
         print (name)
         location = request.json["location"]
-        if db.session.query(Location).filter(Location.venue==location).first() == True:
+        if db.session.query(db.exists().where(Location.venue==location)).scalar():
+        # if db.session.query(Location).filter(Location.venue==location).first() == True:
             location = db.session.query(Location).filter(Location.venue==location).first() 
             LID = location.id
         else: 
@@ -269,84 +269,133 @@ def attendance():
 
      
 
-
+# validation: one record corresponds to one day
 @app.route('/addReadings', methods =['POST'])
 def addreadings():
     try:
         student_mac_dict = {} #get a dictionary that can store SID : mac address
         instances_required = 12 #depending on lesson duration
         cid = 1 #cid of course
-        week = "week01" #depending on start date of course
+        # week = "week01" #depending on start date of course
         course_group = "SMT201 G1"
         time = "1200H"
 
-        macs = Mac.query.all()
-        for m in macs: 
-            mac_address = str(m.mac_address)
-            student_id = m.student_id
-            student_mac_dict[student_id] = mac_address
-            
-        
-        student_id = []
-        student_name = []
-        student_email = []
-        students = Student.query.all()
-        for s in students:
-            sid = s.id
-            student_id.append(sid)
-            sname = s.name
-            student_name.append(sname)
-            semail = s.email
-            student_email.append(semail)
+        # readings that will be sent comes in this format { "MAC", "name of receiver"}
+        # { "mac_address" : "f8:c3:9e:c3:dc:08",
+        #   "receiver_name" : "RPI-R2D2" 
+        # }
+        # from the name of the receiver, i can get the location -> get the course -> check with time -> if in timeframe -> update attendance
+        # from mac, i can get the name of the student 
 
-        reciever_output = request.json['macs'] #retrieve data from job
-        attendancetemp = AttendanceTemp.query.all()
-        attendance = {}
-        for temp in attendancetemp: # if there is no entries will initialize to an empty dict
-            sid = str(temp.student_id)
-            count = temp.count
-            attendance[sid] = count
-        
-        print(attendance)
-        
-        for sid,mac in student_mac_dict.items():
-            if mac in reciever_output:
-                if str(sid) not in attendance:
-                    attendance[str(sid)] = 1
-                else:
-                    attendance[str(sid)] += 1
+        current_datetime = datetime.now()
+        # now += timedelta(days=7)
+        datetime_string = datetime.now().strftime("%Y-%m-%d %H:%M") # cannot use timedelta
+        date = datetime_string.split(' ')[0] 
+        time = datetime_string.split(' ')[1]
+        mac_address = request.json['mac_address']
+        receiver_name = request.json['name']
 
-        print(attendance)
-        
-        for sid,count in attendance.items():
-            if count >= instances_required:
-                if not db.session.query(db.exists().where(Attendance.student_id == str(sid))).scalar():
-                    new_attendance = Attendance(status="Present", student_id=sid, course_id=cid)
-                    db.session.add(new_attendance)
-                    db.session.commit()
+        # datetime_object = datetime.strptime('Jun 1 2005  1:33PM', '%b %d %Y %I:%M%p')
+        # %H:%M
+        receiver = db.session.query(Receiver).filter(Receiver.name==receiver_name).first() 
+        location_id = receiver.location_id
+        # each location definitely belongs to exactly one course thats why dont need validation 
+        course = db.session.query(Course).filter(Course.location_id==location_id).first()
+        # check date and time to verify that the record is during class time and only to be updated in this period
+        start_date = course.start_date
+        end_date = course.end_date
+        start_time = course.start_time
+        end_time = course.end_time
+        start_datetime = str(start_date) + ' ' + str(start_time)
+        end_datetime = str(start_date) + ' ' + str(end_time)
+
+        class_start_datetime = datetime.strptime(start_datetime, "%d-%m-%Y %H:%M")
+        class_end_datetime = datetime.strptime(end_datetime, "%d-%m-%Y %H:%M")
+
+        course_start_datetime = datetime.strptime(start_date, "%d-%m-%Y")
+
+        # create an array of the course datetime objects 
+        course_dates_array = []
+        num_days = 0
+        for week_num in range(14):
+            if week_num == 0: 
+                num_days = 7
             else:
-                if db.session.query(db.exists().where(AttendanceTemp.student_id == str(sid))).scalar():
-                    row = db.session.query(AttendanceTemp).filter(AttendanceTemp.student_id==sid).first()
-                    print (row.count)
-                    row.count = count
-                    db.session.commit()
-                else:
-                    tempattendance = AttendanceTemp(count=count, student_id=sid, course_id=cid)
-                    db.session.add(tempattendance)
-                    db.session.commit()
-       
-        live_output = jsonify({
-            "course_group" : course_group,
-            "time" : time,
-            "week" : week,
-            "student_id" : student_id,
-            "student_names" : student_name,
-            "email": student_email,
-            "attendance": attendance
-        })
-        
-        #send -> location, student_id, student_name, student_email, attendance
-        return render_template("display.php",student_dict = live_output)
+                course_start_datetime += timedelta(days=num_days)
+                course_date = course_start_datetime.strftime("%Y-%m-%d")
+                course_dates_array.append(course_date)
+
+        for i in course_dates_array:
+            if date == i:
+                week = course_dates_array.index(i) + 1
+                if current_datetime < class_end_datetime and current_datetime > class_start_datetime:
+                    macs = Mac.query.all()
+                    for m in macs: 
+                        mac_address = str(m.mac_address)
+                        student_id = m.student_id
+                        student_mac_dict[student_id] = mac_address
+                        
+                    
+                    student_id = []
+                    student_name = []
+                    student_email = []
+                    students = Student.query.all()
+                    for s in students:
+                        sid = s.id
+                        student_id.append(sid)
+                        sname = s.name
+                        student_name.append(sname)
+                        semail = s.email
+                        student_email.append(semail)
+
+                    reciever_output = request.json['macs'] #retrieve data from job
+                    attendancetemp = AttendanceTemp.query.all()
+                    attendance = {}
+                    for temp in attendancetemp: # if there is no entries will initialize to an empty dict
+                        sid = str(temp.student_id)
+                        count = temp.count
+                        attendance[sid] = count
+                    
+                    print(attendance)
+                    
+                    for sid,mac in student_mac_dict.items():
+                        if mac in reciever_output:
+                            if str(sid) not in attendance:
+                                attendance[str(sid)] = 1
+                            else:
+                                attendance[str(sid)] += 1
+
+                    print(attendance)
+                    
+                    for sid,count in attendance.items():
+                        if count >= instances_required:
+                            if not db.session.query(db.exists().where(Attendance.student_id == str(sid))).scalar():
+                                new_attendance = Attendance(status="Present", student_id=sid, course_id=cid, week=)
+                                db.session.add(new_attendance)
+                                db.session.commit()
+                        else:
+                            if db.session.query(db.exists().where(AttendanceTemp.student_id == str(sid))).scalar():
+                                row = db.session.query(AttendanceTemp).filter(AttendanceTemp.student_id==sid).first()
+                                print (row.count)
+                                row.count = count
+                                db.session.commit()
+                            else:
+                                tempattendance = AttendanceTemp(count=count, student_id=sid, course_id=cid)
+                                db.session.add(tempattendance)
+                                db.session.commit()
+                
+                    live_output = jsonify({
+                        "course_group" : course_group,
+                        "time" : time,
+                        "week" : week,
+                        "student_id" : student_id,
+                        "student_names" : student_name,
+                        "email": student_email,
+                        "attendance": attendance
+                    })
+                    
+                    #send -> location, student_id, student_name, student_email, attendance
+                    return render_template("display.php",student_dict = live_output)
     except Exception as e:
         return (str(e))
 
