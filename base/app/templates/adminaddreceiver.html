@@ -11,9 +11,9 @@
     <body>
     <div class="container-contact100">
         <div class="wrap-contact100">
-        <h1>Add Receiver</h1>
-        <form action="http://127.0.0.1:5000/addReceiver" method="post" novalidate>
-            {{ form.hidden_tag() }}
+            <h1>Add Receiver</h1>
+            <form action="http://127.0.0.1:5000/addReceiver" method="post" novalidate>
+                {{ form.hidden_tag() }}
 
         <!-- <p>
             {{ form.name.label }}<br>
@@ -22,42 +22,49 @@
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p> -->
-        <div class="label">
-            {{ form.name.label }}<br>
-        </div>
-        <div class="wrap-input100">  
-            {{ form.name(size=32) }}<br>
-            {% for error in form.name.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-            <span class="focus-input100"></span>
-        </div>
-        <div class="label">
-            {{ form.location.label }} <br>
-            {{ form.location(size=32) }} <br>
-            {% for error in form.location.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-            <span class="focus-input100"></span>
-        </div>
-
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-        <ul>
-            {% for message in messages %}
-            <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
-        {% endif %}
-        {% endwith %}
-
-        <div class="container-contact100-form-btn">
-            <button class="contact100-form-btn">
-                <span>
-                {{ form.submit() }}
-                </span>
-            </button>
-        </div>
+            <div class="label">
+                {{ form.name.label }}<br>
+            </div>
+            <div class="wrap-input100">  
+                {{ form.name(size=32) }}<br>
+                {% for error in form.name.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+                <span class="focus-input100"></span>
+            </div>
         
-    </form>
+            <div class="label">
+                {{ form.location.label }} <br>
+            </div>
+            <div class="wrap-input100">  
+                {{ form.location(size=32) }} <br>
+                {% for error in form.location.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+                <span class="focus-input100"></span>
+            </div>
+        
+
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <ul>
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            {% endwith %}
+
+            <div class="container-contact100-form-btn">
+                <button class="contact100-form-btn">
+                    <span>
+                    {{ form.submit() }}
+                    </span>
+                </button>
+            </div>
+            </form>    
+        </div>
+    </div> 
+    </body>
+</html> 
 {% endblock %}
