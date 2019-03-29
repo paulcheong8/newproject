@@ -2,7 +2,7 @@
 
 {% block content %}
 
-{{ course_code }}
+<h1> {{ course_code }} </h1>
 
 <div class="card animate animated fadeInRight" style="width: 18rem;">
     <div class="card-body">
@@ -16,19 +16,19 @@
             </thead>
             <tbody>
                 {% for n in range(student_name| length) %}
-                  {% if attendance[n] > 12 %}
+                  {% if status[n]=='Present' %}
                     <tr bgcolor='#90EE90'>
                       <td>{{ student_name[n] }}</td>
                       <td>{{ student_email[n] }}</td>
-                      <td>{{ attendance[n] }}</td>
+                      <td>{{ status[n] }}</td>
                     </tr>
                   {% else %}
                     <tr bgcolor='#FFA07A'>
                       <td>{{ student_name[n] }}</td>
                       <td>{{ student_email[n] }}</td>
-                      <td>{{ attendance[n] }}</td>
+                      <td>{{ status[n] }}</td>
                     </tr>
-                  {% end if %}
+                  {% endif %}
                 {% endfor %}
             </tbody>
         </table>

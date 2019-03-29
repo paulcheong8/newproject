@@ -2,8 +2,9 @@
 
 {% block content %}
 
-{{ course_code}}
+<h1> {{ course_code}} </h1>
 
+<h5> {{ date }} </h5>
 <div class="card animate animated fadeInRight" style="width: 18rem;">
     <div class="card-body">
         <table class="table table-hover">
@@ -16,17 +17,18 @@
             </thead>
             <tbody>
                 {% for n in range(student_name| length) %}
-                  {% if attendance[n] > 2 %}
+                  {% set sid = student_id[n] %}
+                  {% if attendance_count[n] > 2 %}
                     <tr bgcolor='#90EE90'>
                       <td>{{ student_name[n] }}</td>
                       <td>{{ student_email[n] }}</td>
-                      <td>{{ attendance[n] }}</td>
+                      <td>{{ attendance_count[n] }}</td>
                     </tr>
                   {% else %}
                     <tr bgcolor='#FFA07A'>
                       <td>{{ student_name[n] }}</td>
                       <td>{{ student_email[n] }}</td>
-                      <td>{{ attendance[n] }}</td>
+                      <td>{{ attendance_count[n] }}</td>
                     </tr>
                   {% endif %}
                 {% endfor %}

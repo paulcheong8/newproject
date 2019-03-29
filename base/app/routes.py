@@ -1,7 +1,7 @@
 from app import app
 from flask import render_template, request, redirect, url_for, flash, jsonify, json
 from app import db
-from app.models import Student, Course, Admin, Mac, Location, Receiver, Attendance, StudentLogin, AttendanceTemp
+from app.models import Student, Course, Admin, Mac, Location, Receiver, Attendance, StudentLogin, AttendanceTemp, student_course_table
 from app.forms import LoginForm, AdminForm, StudentForm, ReceiverForm, AttendanceForm
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.utils import secure_filename
@@ -249,9 +249,8 @@ def attendance():
             course = db.session.query(Course).filter(Course.course_code==course_code).first() 
             course_code = course.course_code
             course_id = course.id
-            time = course.start_time
             if attendance_type == 'current': 
-                return redirect(url_for('displayLiveAttendance', course_code=course_code, time=time))
+                return redirect(url_for('displayLiveAttendance', course_code=course_code, course_id=course_id))
             else: 
                 return redirect(url_for('AttendanceOverview', course_code=course_code, course_id=course_id))
 
@@ -260,48 +259,29 @@ def attendance():
             return render_template('attendance.html', title='Attendance', form=form)
 
     return render_template('attendance.html', title='Attendance', form=form)
-
-# @app.route('/attendance/getAttendance', methods=['GET', 'POST'])
-# @login_required
-# def getAttendance(course):
-#     course_id = course.id
-#     attendance = Attendance.query.filter_by(course_id=course_id).all()
-
      
 
-# validation: one record corresponds to one day
 @app.route('/addReadings', methods =['POST'])
 def addreadings():
     try:
         student_mac_dict = {} #get a dictionary that can store SID : mac address
         instances_required = 12 #depending on lesson duration
-        cid = 1 #cid of course
-        # week = "week01" #depending on start date of course
-        course_group = "SMT201 G1"
-        time = "1200H"
-
-        # readings that will be sent comes in this format { "MAC", "name of receiver"}
-        # { "mac_address" : "f8:c3:9e:c3:dc:08",
-        #   "receiver_name" : "RPI-R2D2" 
-        # }
-        # from the name of the receiver, i can get the location -> get the course -> check with time -> if in timeframe -> update attendance
-        # from mac, i can get the name of the student 
 
         current_datetime = datetime.now()
-        # now += timedelta(days=7)
         datetime_string = datetime.now().strftime("%Y-%m-%d %H:%M") # cannot use timedelta
         date = datetime_string.split(' ')[0] 
-        time = datetime_string.split(' ')[1]
-        mac_address = request.json['mac_address']
+        macs = request.json['macs']
         receiver_name = request.json['name']
 
-        # datetime_object = datetime.strptime('Jun 1 2005  1:33PM', '%b %d %Y %I:%M%p')
-        # %H:%M
+##### NEED TO UNIQUELY IDENTIFY THE COURSE BECAUSE ONE RECEIVER CAN SERVE MANY COURSES ######
+
         receiver = db.session.query(Receiver).filter(Receiver.name==receiver_name).first() 
         location_id = receiver.location_id
         # each location definitely belongs to exactly one course thats why dont need validation 
         course = db.session.query(Course).filter(Course.location_id==location_id).first()
         # check date and time to verify that the record is during class time and only to be updated in this period
+        course_id = course.id
+        print ("this is courseID: ",course_id)
         start_date = course.start_date
         end_date = course.end_date
         start_time = course.start_time
@@ -309,10 +289,10 @@ def addreadings():
         start_datetime = str(start_date) + ' ' + str(start_time)
         end_datetime = str(start_date) + ' ' + str(end_time)
 
-        class_start_datetime = datetime.strptime(start_datetime, "%d-%m-%Y %H:%M")
-        class_end_datetime = datetime.strptime(end_datetime, "%d-%m-%Y %H:%M")
+        class_start_datetime = datetime.strptime(start_datetime, "%Y-%m-%d %H:%M")
+        class_end_datetime = datetime.strptime(end_datetime, "%Y-%m-%d %H:%M")
 
-        course_start_datetime = datetime.strptime(start_date, "%d-%m-%Y")
+        course_start_datetime = datetime.strptime(start_date, "%Y-%m-%d")
 
         # create an array of the course datetime objects 
         course_dates_array = []
@@ -320,6 +300,7 @@ def addreadings():
         for week_num in range(14):
             if week_num == 0: 
                 num_days = 7
+                course_dates_array.append(str(start_date))
             else:
                 course_start_datetime += timedelta(days=num_days)
                 course_date = course_start_datetime.strftime("%Y-%m-%d")
@@ -328,6 +309,12 @@ def addreadings():
         for i in course_dates_array:
             if date == i:
                 week = course_dates_array.index(i) + 1
+                print ("current time: ", current_datetime)
+                print ("end time: ", class_end_datetime)
+                print ("start time: ", class_start_datetime)
+                class_end_datetime += timedelta(days=course_dates_array.index(i)*7)
+                class_start_datetime += timedelta(days=course_dates_array.index(i)*7)
+
                 if current_datetime < class_end_datetime and current_datetime > class_start_datetime:
                     macs = Mac.query.all()
                     for m in macs: 
@@ -335,11 +322,11 @@ def addreadings():
                         student_id = m.student_id
                         student_mac_dict[student_id] = mac_address
                         
-                    
                     student_id = []
                     student_name = []
                     student_email = []
                     students = Student.query.all()
+
                     for s in students:
                         sid = s.id
                         student_id.append(sid)
@@ -355,24 +342,40 @@ def addreadings():
                         sid = str(temp.student_id)
                         count = temp.count
                         attendance[sid] = count
-                    
-                    print(attendance)
-                    
+                                        
                     for sid,mac in student_mac_dict.items():
                         if mac in reciever_output:
                             if str(sid) not in attendance:
                                 attendance[str(sid)] = 1
                             else:
                                 attendance[str(sid)] += 1
-
-                    print(attendance)
                     
+########## why doesnt the count increase more than 11? #############
                     for sid,count in attendance.items():
                         if count >= instances_required:
+                            # if student record does not exist in Attendance, => create a record
                             if not db.session.query(db.exists().where(Attendance.student_id == str(sid))).scalar():
-                                new_attendance = Attendance(status="Present", student_id=sid, course_id=cid, week=)
+                                new_attendance = Attendance(status="Present", student_id=sid, course_id=course_id, week=week)
                                 db.session.add(new_attendance)
                                 db.session.commit()
+                            else:
+                                attendance_records = db.session.query(Attendance).filter(Attendance.student_id==sid).all()
+                                course_records = []
+                                week_records = []
+                                for record in attendance_records:
+                                    course_records.append(record.course_id)
+                                    week_records.append(record.week)
+                                # validation for subsequent week's attends for that one course 
+                                if (week not in week_records) and (course_id in course_records):
+                                    new_attendance = Attendance(status="Present", student_id=sid, course_id=course_id, week=week)
+                                    db.session.add(new_attendance)
+                                    db.session.commit()
+                                # validation for a new course's attendance
+                                if (week not in week_records) and (course_id not in course_records):
+                                    new_attendance = Attendance(status="Present", student_id=sid, course_id=course_id, week=week)
+                                    db.session.add(new_attendance)
+                                    db.session.commit()
+
                         else:
                             if db.session.query(db.exists().where(AttendanceTemp.student_id == str(sid))).scalar():
                                 row = db.session.query(AttendanceTemp).filter(AttendanceTemp.student_id==sid).first()
@@ -380,90 +383,87 @@ def addreadings():
                                 row.count = count
                                 db.session.commit()
                             else:
-                                tempattendance = AttendanceTemp(count=count, student_id=sid, course_id=cid)
+                                tempattendance = AttendanceTemp(count=count, student_id=sid, course_id=course_id)
                                 db.session.add(tempattendance)
                                 db.session.commit()
                 
-                    live_output = jsonify({
-                        "course_group" : course_group,
-                        "time" : time,
-                        "week" : week,
-                        "student_id" : student_id,
-                        "student_names" : student_name,
-                        "email": student_email,
-                        "attendance": attendance
-                    })
-                    
-                    #send -> location, student_id, student_name, student_email, attendance
-                    return render_template("display.php",student_dict = live_output)
+                    return "Updated Successfully!"
+
+# line below is to delete all rows in the AttendanceTemp when the class ends 
+
+                # elif current_datetime > class_start_datetime:
+                #     absent = db.session.query(AttendanceTemp).filter(AttendanceTemp.count < instances_required).all()
+                #     for a in absent:
+                #         sid = a.student_id
+                #         new_attendance = Attendance(status="Absent", student_id=sid, course_id=course_id, week=week)
+                #         db.session.add(new_attendance)
+                #         db.session.commit()
+                #     attendance_temp = AttendanceTemp.query.all()
+                #     for a in attendance_temp:
+                #         db.session.delete(a)
+
+
     except Exception as e:
         return (str(e))
 
-@app.route('/displayLiveAttendance/<course_code>/<time>', methods =['GET', 'POST'])
-def displayLiveAttendance(course_code,course_id,time):
-    week = "week01" #depending on start date of course
-
-    print (course_code)
-    print (time)
+@app.route('/displayLiveAttendance/<course_code>/<course_id>/', methods =['GET', 'POST'])
+@login_required
+def displayLiveAttendance(course_code, course_id):
 
     student_id = []
     student_name = []
     student_email = []
-    students = Student.query.all()
-    for s in students:
-        sid = s.id
-        student_id.append(sid)
-        sname = str(s.name)
-        student_name.append(sname)
-        semail = str(s.email)
-        student_email.append(semail)
+    date = (datetime.now().strftime("%Y-%m-%d %H:%M"))
 
-    attendancetemp = AttendanceTemp.query.all()
-    attendance = {}
-    for temp in attendancetemp: # if there is no entries will initialize to an empty dict
-        sid = str(temp.student_id)
-        count = temp.count
-        attendance[sid] = count
+    all = db.session.query(student_course_table).all()
 
-    live_output = {
-        "course_code" : course_code,
-        "time" : time,
-        # "week" : week,
-        "student_id" : student_id,
-        "student_names" : student_name,
-        "email": student_email,
-        "attendance": attendance
-        }
-    
-    # print(live_output)
+    for i in all:
+        print (type(i[1]))
+        if i[1] == int(course_id):
+            student_id.append(i[0])
+            student = db.session.query(Student).filter(Student.id==str(i[0])).first()
+            sname = str(student.name)
+            student_name.append(sname)
+            semail = str(student.email)
+            student_email.append(semail)
 
-    # fp = open('/tmp/live_output', 'w+')
-    # live_output = dict(json.dump(fp, live_output))
+    attendance_count = []
 
-    live_output = json.dumps(live_output)
-    # print (type(live_output))
+    for id in student_id:
+        if db.session.query(db.exists().where(AttendanceTemp.student_id == str(id))).scalar():
+            attendance = db.session.query(AttendanceTemp).filter(AttendanceTemp.student_id==str(id)).first()
+            attendance_count.append(attendance.count)
+        else:
+            attendance_count.append(0)
     
     return render_template(
         "displayLive.html",
+        date=date,
         course_code=course_code,
-        time=time,
         student_id=student_id,
         student_name=student_name,
         student_email=student_email,
-        attendance=attendance)
+        attendance_count=attendance_count)
 
 @app.route('/AttendanceOverview/<course_code>/<course_id>/', methods =['GET', 'POST'])
+@login_required
 def AttendanceOverview(course_code,course_id):
     week = "week01" #depending on start date of course
 
     student_name = []
+    student_id = []
     student_email = []
     attendance = Attendance.query.filter_by(course_id=course_id).all()
     status = []
+    week = []
+
     for i in range(len(attendance)):
+        
         student = Student.query.filter_by(id=attendance[i].student_id).first()
+        student_id.append(student.id)
         student_name.append(student.name)
         student_email.append(student.email)
+        
         status.append(attendance[i].status)
     
     return render_template(
