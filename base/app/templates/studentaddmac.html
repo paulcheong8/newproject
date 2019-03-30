@@ -1,42 +1,76 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Update Mac Addresses</h1>
-    <form action="" method="post" novalidate>
-        {{ form.hidden_tag() }}
+<html>
+    <head>
+        <title>Smart Attendance</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/full.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/util.css') }}">
+    </head>
+    <body>
+    <div class="container-contact100">
+        <div class="wrap-contact100">
+            <form action="" method="post" novalidate>
+                {{ form.hidden_tag() }}
+                <span class="contact100-form-title">
+                    Update Mac Addresses
+                </span>
 
-            {% with messages = get_flashed_messages() %}
-            {% if messages %}
-            <ul>
-                {% for message in messages %}
-                <li>{{ message }}</li>
-                {% endfor %}
-            </ul>
-            {% endif %}
-            {% endwith %}
-            <p>
-                {{ form.name.label }} (As per matriculation)<br>
-                {{ form.name(size=32) }}<br>
-                {% for error in form.name.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-                {% endfor %}
-            </p>
-        <p>
-            {{ form.email.label }}<br>
-            {{ form.email(size=32) }}<br>
-            {% for error in form.email.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.mac_addresses.label }} (Please separate each Mac Address with a comma)<br>
-            {{ form.mac_addresses(size=32) }}<br>
-            {% for error in form.mac_addresses.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>{{ form.submit() }}</p>
+                <div class="label">
+                    {{ form.name.label }} (As per matriculation)
+                </div>    
+                <div class="wrap-input100">  
+                    {{ form.name(size=32) }}<br>
+                    {% for error in form.name.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                    <span class="focus-input100"></span>
+                </div>
 
+                <div class="label">
+                    {{ form.email.label }}<br>
+                </div>
+                <div class="wrap-input100">  
+                    {{ form.email(size=32) }}<br>
+                    {% for error in form.email.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                    <span class="focus-input100"></span>
+                </div>
 
-    </form>
+                <div class="label">
+                    {{ form.mac_addresses.label }} (Please separate each Mac Address with a comma)<br>
+                </div>
+                <div class="wrap-input100">  
+                    {{ form.mac_addresses(size=32) }}<br>
+                    {% for error in form.mac_addresses.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                    <span class="focus-input100"></span>
+                </div>
+
+        
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                    <ul>
+                        {% for message in messages %}
+                        <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                    {% endwith %}
+
+                <div class="container-contact100-form-btn">
+                    <button class="contact100-form-btn">
+                        <span>   
+                            {{ form.submit() }}
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    </body>
+</html>
 {% endblock %}
