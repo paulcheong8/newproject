@@ -145,6 +145,17 @@ def addReceiver():
         redirect(url_for('admin_add_receiver'))
         return (str(e))
 
+@app.rout('/deleteReceiver/<name>', methods=["DELETE"])
+def deleteReceiver(name):
+    receiver = Receiver.query.get(name)
+    if receiver == None:
+        flash ('Please enter a vaid receiver name')
+    else:
+        db.session.delete(name)
+        db.session.commit()
+        return jsonify('Raspi {} was deleted'.format(name))
+
+
 @app.route('/student')
 @login_required
 def student():
@@ -184,6 +195,7 @@ def student_add_mac():
     return render_template('studentaddmac.html', title='Student', form=form)
 
 
+
 @app.route('/addcourse', methods=["POST"]) # tested and working 
 def add_course():
     course_code = request.json["course_code"]
@@ -219,6 +231,16 @@ def add_course():
         return jsonify("{} was created".format(new_course))
     except Exception as e:
         return (str(e))
+
+@app.route('/deletecourse/<course_id>', methods = ["DELETE"])
+def delete_course(course_id):
+    course = Course.query.get(course_id)
+    if course == None:
+        flash ('Please enter a valid course ID')
+    else:
+        db.session.delete(course)
+        db.session.commit()
+        return jsonify('{} was deleted'.format(course_id))
 
 @app.route('/updateMAC', methods=["POST","PUT"]) # tested and working
 def add_mac():
