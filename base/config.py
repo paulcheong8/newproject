@@ -4,12 +4,11 @@ class Config(object):
 
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-will-never-guess'
 
-    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:Chicken101@localhost/SmartAttendance'
-    # SQLALCHEMY_DATABASE_URI = 'postgres://hysfhbmhjxdqeu:b3663b1293e45b7e55ac63d419eead755a786af9e7212def3bb7ff851ccf95cb@ec2-184-72-238-22.compute-1.amazonaws.com:5432/dbjcr7q3pq6tq3'
-
-    # SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
-    # LOG_TO_STDOUT = os.environ.get('LOG_TO_STDOUT')
-
+    # SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:Chicken101@localhost/SmartAttendance'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+    LOG_TO_STDOUT = os.environ.get('LOG_TO_STDOUT')
+    # SQLALCHEMY_DATABASE_URI = 'postgres://lgibhcwcleouzl:4e13a89c0c0b64ec0f0e0ea916456888d697630cc8fdf40af9977ecb4cd0cec2@ec2-23-23-241-119.compute-1.amazonaws.com:5432/da6um0if08b6hq'
+# export DATABASE_URL="postgresql://lgibhcwcleouzl:4e13a89c0c0b64ec0f0e0ea916456888d697630cc8fdf40af9977ecb4cd0cec2@ec2-23-23-241-119.compute-1.amazonaws.com:5432/da6um0if08b6hq"
 #     POSTGRES = {
 #     'user': 'postgres',
 #     'pw': 'Chicken101',
