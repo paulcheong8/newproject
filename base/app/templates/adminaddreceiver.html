@@ -11,10 +11,11 @@
     <body>
     <div class="container-contact100">
         <div class="wrap-contact100">
-            <h1>Add Receiver</h1>
             <form action="http://127.0.0.1:5000/addReceiver" method="post" novalidate>
                 {{ form.hidden_tag() }}
-
+                <span class="contact100-form-title">
+                    Add Receiver
+                </span>
         <!-- <p>
             {{ form.name.label }}<br>
             {{ form.name(size=32) }}<br>
