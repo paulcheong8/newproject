@@ -500,5 +500,20 @@ def getStudentAttendance(student_email):
     student_attendance = Attendance.query.filter_by(student_id=student_id).first()
     return jsonify(student_attendance.serialize())
 
+# GET request for courses, yet to try out on database
+@app.route('/getCourses', methods=['GET'])
+def getCourses():
+    if 'course_code' in request.args():
+        course_code = request.args.get('course_code')
+        if db.session.query(db.exists().where(Course.code==course_code)).scalar():
+            course = db.session.query(Course).filter(Course.code==course_code).first()
+            return jsonify(course.serialize())
+        else:
+            return "Error: Course not found"
+    else:
+        courses = Course.query.all()
+        return jsonify([c.serialize() for c in courses])
+
+
 if __name__ == '__main__':
 	app.run(debug=True)
