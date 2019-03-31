@@ -149,11 +149,26 @@ def addReceiver():
 def deleteReceiver(name):
     receiver = Receiver.query.get(name)
     if receiver == None:
-        flash ('Please enter a vaid receiver name')
+        flash ('Please enter a valid receiver name')
     else:
         db.session.delete(name)
         db.session.commit()
         return jsonify('Raspi {} was deleted'.format(name))
+
+# PUT request for receiver, assuming receiver only can change name, yet to be tested out
+@app.route('/updateReceiver/<int:receiver_id>', methods=['PUT'])
+def updateReceiver(receiver_id):
+    if db.session.query(db.exists().where(Receiver.id==receiver_id)).scalar():
+        receiver = db.session.query(Receiver).filter(Receiver.id==receiver_id).first()
+        if 'name' in request.json.keys():
+            name = request.json['name']
+            receiver.name = name
+        db.session.commit()
+        return jsonify('Receiver id: {} has been updated'.format(receiver.id))
+    else:
+        return "Please enter a valid receiver id"
+
+
 
 @app.route('/student')
 @login_required
