@@ -195,7 +195,6 @@ def student_add_mac():
     return render_template('studentaddmac.html', title='Student', form=form)
 
 
-
 @app.route('/addcourse', methods=["POST"]) # tested and working 
 def add_course():
     course_code = request.json["course_code"]

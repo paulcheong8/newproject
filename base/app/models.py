@@ -129,7 +129,7 @@ class Course(db.Model):
             'start_time': self.start_time,
             'end_time': self.end_time,
             'location_id': self.location_id,
-            'students': [s.serialize() for s in self.students]
+            'students': [s.name for s in self.students] #changed to s.name to get students' names only, instead of s.serialize() which might cause recursion problem
         }
 
 class Location(db.Model):
