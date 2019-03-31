@@ -145,7 +145,7 @@ def addReceiver():
         redirect(url_for('admin_add_receiver'))
         return (str(e))
 
-@app.rout('/deleteReceiver/<name>', methods=["DELETE"])
+@app.route('/deleteReceiver/<name>', methods=["DELETE"])
 def deleteReceiver(name):
     receiver = Receiver.query.get(name)
     if receiver == None:
@@ -154,7 +154,6 @@ def deleteReceiver(name):
         db.session.delete(name)
         db.session.commit()
         return jsonify('Raspi {} was deleted'.format(name))
-
 
 @app.route('/student')
 @login_required
@@ -193,7 +192,6 @@ def student_add_mac():
         flash ('Mac Address has been updated!')
         return redirect(url_for('student_add_mac'))
     return render_template('studentaddmac.html', title='Student', form=form)
-
 
 @app.route('/addcourse', methods=["POST"]) # tested and working 
 def add_course():
@@ -281,7 +279,6 @@ def attendance():
 
     return render_template('attendance.html', title='Attendance', form=form)
      
-
 @app.route('/addReadings', methods =['POST'])
 def addreadings():
     try:
@@ -493,6 +490,15 @@ def AttendanceOverview(course_code,course_id):
         student_name=student_name,
         student_email=student_email,
         status=status)
+
+@app.route('/getStudentAttendance/<student_email>', methods=["GET"])
+def getStudentAttendance(student_email):
+
+    student = Student.query.filter_by(email=student_email).first()
+    student_id = student.id
+
+    student_attendance = Attendance.query.filter_by(student_id=student_id).first()
+    return jsonify(student_attendance.serialize())
 
 if __name__ == '__main__':
 	app.run(debug=True)
