@@ -25,10 +25,10 @@ class ReceiverForm(FlaskForm):
 class AdminForm(FlaskForm):
     course_code = StringField('Course Code', validators=[DataRequired()])
     student_details = FileField(validators=[FileRequired(), FileAllowed(['csv'], 'CSV files only!')])
-    start_time = StringField('Start Time', validators=[DataRequired()])
-    end_time = StringField('End Time', validators=[DataRequired()])
-    start_date = StringField('Start Date', validators=[DataRequired()])
-    end_date = StringField('End Date', validators=[DataRequired()])
+    start_time = StringField('Start Time (HH:MM)', validators=[DataRequired()])
+    end_time = StringField('End Time (HH:MM)', validators=[DataRequired()])
+    start_date = StringField('Start Date (YYYY-MM-DD)', validators=[DataRequired()])
+    end_date = StringField('End Date (YYYY-MM-DD)', validators=[DataRequired()])
     location = StringField('Location', validators=[DataRequired()])
     submit = SubmitField('Add')
 

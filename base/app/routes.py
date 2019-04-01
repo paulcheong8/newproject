@@ -120,7 +120,7 @@ def admin_add_receiver():
         return redirect(url_for('admin_add_receiver'))
     return render_template('adminaddreceiver.html', title='Admin', form=form)         
 
-@app.route('/addReceiver', methods=['GET','POST']) # tested and working  
+@app.route('/addReceiver', methods=['GET', 'POST']) # tested and working  
 def addReceiver():
     try:
         name = request.json['name']
