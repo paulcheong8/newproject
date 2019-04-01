@@ -11,18 +11,27 @@
     <body>
     <div class="container-contact100">
         <div class="wrap-contact100">
-            <form action="http://127.0.0.1:5000/addReceiver" method="post" novalidate>
+            <form action="http://127.0.0.1:5000/admin/addReceiver" method="post" novalidate>
                 {{ form.hidden_tag() }}
                 <span class="contact100-form-title">
                     Add Receiver
                 </span>
-        <!-- <p>
-            {{ form.name.label }}<br>
-            {{ form.name(size=32) }}<br>
-            {% for error in form.name.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p> -->
+
+
+            
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                <ul>
+                    {% for message in messages %}
+                    <div class='messages'>
+                        <li>{{ message }}</li>
+                    </div>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                {% endwith %}
+           
+                
             <div class="label">
                 {{ form.name.label }}<br>
             </div>
@@ -44,17 +53,6 @@
                 {% endfor %}
                 <span class="focus-input100"></span>
             </div>
-        
-
-            {% with messages = get_flashed_messages() %}
-            {% if messages %}
-            <ul>
-                {% for message in messages %}
-                <li>{{ message }}</li>
-                {% endfor %}
-            </ul>
-            {% endif %}
-            {% endwith %}
 
             <div class="container-contact100-form-btn">
                 <button class="contact100-form-btn">

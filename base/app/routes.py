@@ -11,9 +11,10 @@ from datetime import datetime, timedelta
 def index():
     return redirect(url_for('login'))
 
+# this is the login page for both admins and students, and depending on their identity, they will be redirected 
+# to different URLs
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-
     form = LoginForm()
     if form.validate_on_submit():
         admin = Admin.query.filter_by(email=form.username.data).first()
@@ -30,16 +31,21 @@ def login():
 
     return render_template('login.html', title='Sign In', form=form)
 
+# route to logout 
 @app.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('login'))
 
+# route for admins 
 @app.route('/admin', methods=['GET', 'POST'])
 @login_required
 def admin():
     return render_template('admin.html', title='Admin')
 
+# web application's route to update course information. 
+# this URL will at the same time be creating other instances (for eg. Students and Location) in the database
+# we used flask addon WhatTheForms to help with form processing
 @app.route('/admin/updateinformation', methods=['GET', 'POST']) # tested and working 
 @login_required
 def updateInformation():
@@ -95,39 +101,44 @@ def updateInformation():
         return redirect(url_for('updateInformation'))
     return render_template('updateinformation.html', title='Admin', form=form)
 
+# web application's URL for admins to add Receivers into a particular location
 @app.route('/admin/addReceiver', methods=['GET', 'POST']) # tested and working 
 @login_required
 def admin_add_receiver():
-    form = ReceiverForm()
-    if form.validate_on_submit():
-        name = form.name.data
-        location = form.location.data
+    try: 
+        form = ReceiverForm()
+        if form.validate_on_submit():
+            name = form.name.data
+            location = form.location.data
 
-        if db.session.query(db.exists().where(Location.venue==location)).scalar():
-            location = db.session.query(Location).filter(Location.venue==location).first() 
-            LID = location.id
-        else: 
-            new_location = Location(venue=location)
-            db.session.add(new_location)
+            if db.session.query(db.exists().where(Location.venue==location)).scalar():
+                location = db.session.query(Location).filter(Location.venue==location).first() 
+                LID = location.id
+            else: 
+                new_location = Location(venue=location)
+                db.session.add(new_location)
+                db.session.commit()
+                LID = new_location.id
+
+            new_receiver = Receiver(name=name, location_id=LID)
+            db.session.add(new_receiver)
             db.session.commit()
-            LID = new_location.id
 
-        new_receiver = Receiver(name=name, location_id=LID)
-        db.session.add(new_receiver)
-        db.session.commit()
+            flash ('Receiver has been updated!')
+            return redirect(url_for('admin_add_receiver'))
+        return render_template('adminaddreceiver.html', title='Admin', form=form)
+    except Exception as e:
+        redirect(url_for('admin_add_receiver'))   
+        return (str(e))      
 
-        flash ('Receiver has been updated!')
-        return redirect(url_for('admin_add_receiver'))
-    return render_template('adminaddreceiver.html', title='Admin', form=form)         
-
-@app.route('/addReceiver', methods=['GET', 'POST']) # tested and working  
+# API for users to add a receiver 
+@app.route('/addReceiver', methods=['POST']) # tested and working  
 def addReceiver():
     try:
         name = request.json['name']
         print (name)
         location = request.json["location"]
         if db.session.query(db.exists().where(Location.venue==location)).scalar():
-        # if db.session.query(Location).filter(Location.venue==location).first() == True:
             location = db.session.query(Location).filter(Location.venue==location).first() 
             LID = location.id
         else: 
@@ -145,13 +156,14 @@ def addReceiver():
         redirect(url_for('admin_add_receiver'))
         return (str(e))
 
-@app.route('/deleteReceiver/<name>', methods=["DELETE"])
+# API for users to delete an existing Receiver
+@app.route('/deleteReceiver/<name>', methods=["DELETE"]) # tested and working 
 def deleteReceiver(name):
-    receiver = Receiver.query.get(name)
+    receiver = db.session.query(Receiver).filter(Receiver.name==name).first() 
     if receiver == None:
-        flash ('Please enter a valid receiver name')
+        return ('Please enter a valid receiver name')
     else:
-        db.session.delete(name)
+        db.session.delete(receiver)
         db.session.commit()
         return jsonify('Raspi {} was deleted'.format(name))
 
