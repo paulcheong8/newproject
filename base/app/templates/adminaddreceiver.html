@@ -4,7 +4,6 @@
 <html>
     <head>
         <title>Smart Attendance</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/backgroundother.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/util.css') }}">
     </head>
@@ -17,51 +16,50 @@
                     Add Receiver
                 </span>
 
-
-            
-                {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                <ul>
-                    {% for message in messages %}
-                    <div class='messages'>
-                        <li>{{ message }}</li>
-                    </div>
-                    {% endfor %}
-                </ul>
-                {% endif %}
-                {% endwith %}
-           
+                <div class="messages">
+                    {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                    <ul>
+                        {% for message in messages %}
+                        <div class='messages'>
+                            <li>{{ message }}</li>
+                        </div>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                    {% endwith %}
+                </div>
                 
-            <div class="label">
-                {{ form.name.label }}<br>
-            </div>
-            <div class="wrap-input100">  
-                {{ form.name(size=32) }}<br>
-                {% for error in form.name.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-                {% endfor %}
-                <span class="focus-input100"></span>
-            </div>
+                <div class="label">
+                    {{ form.name.label }}<br>
+                </div>
+                <div class="wrap-input100">  
+                    {{ form.name(size=32) }}<br>
+                    {% for error in form.name.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                    <span class="focus-input100"></span>
+                </div>
         
-            <div class="label">
-                {{ form.location.label }} <br>
-            </div>
-            <div class="wrap-input100">  
-                {{ form.location(size=32) }} <br>
-                {% for error in form.location.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-                {% endfor %}
-                <span class="focus-input100"></span>
-            </div>
+                <div class="label">
+                    {{ form.location.label }} <br>
+                </div>
+                <div class="wrap-input100">  
+                    {{ form.location(size=32) }} <br>
+                    {% for error in form.location.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                    <span class="focus-input100"></span>
+                </div>
 
-            <div class="container-contact100-form-btn">
-                <button class="contact100-form-btn">
-                    <span>
-                        {{ form.submit() }}
-                        Add
-                    </span>
-                </button>
-            </div>
+                <div class="container-contact100-form-btn">
+                    <button class="contact100-form-btn">
+                        <span>
+                            {{ form.submit() }}
+                            Add
+                        </span>
+                    </button>
+                </div>
             </form>    
         </div>
     </div> 
