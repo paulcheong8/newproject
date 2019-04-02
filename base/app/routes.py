@@ -6,6 +6,27 @@ from app.forms import LoginForm, AdminForm, StudentForm, ReceiverForm, Attendanc
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
+import requests
+
+#start telebot stuff
+my_token = '768680685:AAFuQGAYKqda7mRVBwMB2EIHtvKGLM6qiII'
+url_base = 'https://api.telegram.org/bot{}/'.format(my_token)
+
+url_getUpdates = '{}getupdates'.format(url_base)
+url_sendMsg = '{}sendMessage'.format(url_base)
+url_sendPhoto = '{}sendPhoto'.format(url_base)
+
+
+r = requests.get(url_getUpdates)
+results = r.json()["result"]
+
+chat_id_list = []
+
+for update in results:
+    if update["message"]["chat"]["id"] not in chat_id_list:
+        chat_id_list.append(update["message"]["chat"]["id"])
+
+#end telebot stuff
 
 @app.route('/')
 def index():
@@ -180,8 +201,6 @@ def updateReceiver(receiver_id):
     else:
         return "Please enter a valid receiver id"
 
-
-
 @app.route('/student')
 @login_required
 def student():
@@ -317,6 +336,56 @@ def addreadings():
         date = datetime_string.split(' ')[0] 
         macs = request.json['macs']
         receiver_name = request.json['name']
+
+        #start tele bot stuff
+        first_update = True
+        latest_update_time = ""
+        error_occurred = False
+        error_occurrences = []
+        if first_update == True:
+            first_update = False
+            latest_update_time =current_datetime
+        else:
+            time_since_last_update = (current_datetime - latest_update_time).seconds/60 #minutes
+            if time_since_last_update > 60:
+                message = "An error with the receiver has occured! Please ensure that receiver {} is in working condition!\n".format(receiver_name)
+                message += "Location: SIS SR2-2"
+                photo = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Achtung.svg/1200px-Achtung.svg.png"
+                for chat_id in chat_id_list:
+                    params = {"chat_id":chat_id, "text": message}
+                    r = requests.post(url_sendMsg,params)
+
+                    params = {"chat_id":chat_id, "photo":photo}
+                    r = requests.post(url_sendPhoto,params)
+                error_occurred = True
+                error_occurrences.append(current_datetime)
+            else:
+                latest_update_time =current_datetime
+        if current_datetime.hour == 7:
+            if error_occurred == False:
+                message = "No errors have been reported since 7am yesterday!"
+                photo = "https://i.imgflip.com/utnxs.jpg"
+                for chat_id in chat_id_list:
+                    params = {"chat_id":chat_id, "text": message}
+                    r = requests.post(url_sendMsg,params)
+
+                    params = {"chat_id":chat_id, "photo":photo}
+                    r = requests.post(url_sendPhoto,params)
+            else:
+                message = "Errors were reported at the following times:\n"
+                for error_time in error_occurrences:
+                    message += str(error_time) + "\n"
+                photo = "https://peopledotcom.files.wordpress.com/2017/04/guilty-dog.jpg?w=2000"
+                for chat_id in chat_id_list:
+                    params = {"chat_id":chat_id, "text": message}
+                    r = requests.post(url_sendMsg,params)
+
+                    params = {"chat_id":chat_id, "photo":photo}
+                    r = requests.post(url_sendPhoto,params)
+                error_occurred = False
+                error_occurrences = []
+            
+        #end tele bot stuff
 
 ##### NEED TO UNIQUELY IDENTIFY THE COURSE BECAUSE ONE RECEIVER CAN SERVE MANY COURSES ######
 
