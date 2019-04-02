@@ -569,7 +569,7 @@ def AttendanceOverview(course_code,course_id):
     student_email = []
     attendance = Attendance.query.filter_by(course_id=course_id).all()
     status = []
-    week = []
+    week = [1,2,3,4,5,6,7,8,9,10,11,12,13,14]
 
     for i in range(len(attendance)):
         
@@ -585,7 +585,9 @@ def AttendanceOverview(course_code,course_id):
         course_code=course_code,
         student_name=student_name,
         student_email=student_email,
-        status=status)
+        status=status,
+        week=week)
+
 
 @app.route('/getStudentAttendance/<student_email>', methods=["GET"])
 def getStudentAttendance(student_email):
