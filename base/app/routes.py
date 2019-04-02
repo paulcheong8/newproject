@@ -349,8 +349,9 @@ def addreadings():
             time_since_last_update = (current_datetime - latest_update_time).seconds/60 #minutes
             if time_since_last_update > 60:
                 message = "An error with the receiver has occured! Please ensure that receiver {} is in working condition!\n".format(receiver_name)
-                message += "Location: SIS SR2-2"
-                photo = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Achtung.svg/1200px-Achtung.svg.png"
+                message += "Location: SIS SR2-2\n"
+                message += "Time:" + str(datetime_string)
+                photo = "https://i.imgflip.com/ehl86.jpg"
                 for chat_id in chat_id_list:
                     params = {"chat_id":chat_id, "text": message}
                     r = requests.post(url_sendMsg,params)
@@ -362,8 +363,9 @@ def addreadings():
             else:
                 latest_update_time =current_datetime
         if current_datetime.hour == 7:
+            message = "Daily report for {}".format(current_datetime.strftime('%Y-%m-%d'))
             if error_occurred == False:
-                message = "No errors have been reported since 7am yesterday!"
+                message += "\nNo errors have been reported since 7am yesterday!"
                 photo = "https://i.imgflip.com/utnxs.jpg"
                 for chat_id in chat_id_list:
                     params = {"chat_id":chat_id, "text": message}
@@ -372,7 +374,7 @@ def addreadings():
                     params = {"chat_id":chat_id, "photo":photo}
                     r = requests.post(url_sendPhoto,params)
             else:
-                message = "Errors were reported at the following times:\n"
+                message += "\nErrors were reported at the following times since the previous report:\n"
                 for error_time in error_occurrences:
                     message += str(error_time) + "\n"
                 photo = "https://peopledotcom.files.wordpress.com/2017/04/guilty-dog.jpg?w=2000"
