@@ -15,12 +15,12 @@ class StudentForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired()])
     mac_addresses = StringField('Mac Address', validators=[DataRequired()])
-    submit = SubmitField('Add')
+    submit = SubmitField('')
 
 class ReceiverForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     location = StringField('Location', validators=[DataRequired()])
-    submit = SubmitField('Add')
+    submit = SubmitField('')
     
 class AdminForm(FlaskForm):
     course_code = StringField('Course Code', validators=[DataRequired()])
@@ -30,7 +30,7 @@ class AdminForm(FlaskForm):
     start_date = StringField('Start Date (YYYY-MM-DD)', validators=[DataRequired()])
     end_date = StringField('End Date (YYYY-MM-DD)', validators=[DataRequired()])
     location = StringField('Location', validators=[DataRequired()])
-    submit = SubmitField('Add')
+    submit = SubmitField('')
 
 class AttendanceForm(FlaskForm):
     course_code = StringField('Course', validators=[DataRequired()])
