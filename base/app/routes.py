@@ -86,7 +86,7 @@ def updateInformation():
         # filename = secure_filename(student_details.filename)
         contents = student_details.read()
 
-        contents = contents.decode()
+        # contents = contents.decode()
         contents_stripped = contents.rstrip("\r\n")
         contents_split = contents_stripped.split("\r\n")
         first_row = True
@@ -333,8 +333,8 @@ def addreadings():
         student_mac_dict = {} #get a dictionary that can store SID : mac address
         instances_required = 12 #depending on lesson duration
 
-        current_datetime = datetime.now()
-        datetime_string = datetime.now().strftime("%Y-%m-%d %H:%M") # cannot use timedelta
+        current_datetime = datetime.now() + timedelta(seconds=28800)
+        datetime_string = current_datetime.strftime("%Y-%m-%d %H:%M") # cannot use timedelta
         date = datetime_string.split(' ')[0] 
         macs = request.json['macs']
         receiver_name = request.json['name']
@@ -538,9 +538,9 @@ def displayLiveAttendance(course_code, course_id):
     date = date.strftime("%Y-%m-%d %H:%M")
 
     all = db.session.query(student_course_table).all()
-
+    print (all)
     for i in all:
-        print (type(i[1]))
+        # print (type(i[1]))
         if i[1] == int(course_id):
             student_id.append(i[0])
             student = db.session.query(Student).filter(Student.id==str(i[0])).first()
