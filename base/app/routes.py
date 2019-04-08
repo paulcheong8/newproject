@@ -507,6 +507,8 @@ def addreadings():
                 
                     return "Updated Successfully!"
 
+            else: 
+                return "There is no class ongoing now."
 # line below is to delete all rows in the AttendanceTemp when the class ends 
 
                 # elif current_datetime > class_start_datetime:
@@ -531,7 +533,9 @@ def displayLiveAttendance(course_code, course_id):
     student_id = []
     student_name = []
     student_email = []
-    date = (datetime.now().strftime("%Y-%m-%d %H:%M"))
+    # date = (datetime.now().strftime("%Y-%m-%d %H:%M"))
+    date = datetime.now() + timedelta(seconds=28800)
+    date = date.strftime("%Y-%m-%d %H:%M")
 
     all = db.session.query(student_course_table).all()
 
@@ -566,10 +570,6 @@ def displayLiveAttendance(course_code, course_id):
 @app.route('/AttendanceOverview/<course_code>/<course_id>/', methods =['GET', 'POST'])
 @login_required
 def AttendanceOverview(course_code,course_id):
-<<<<<<< HEAD
-=======
-    # week = "week01" #depending on start date of course
->>>>>>> 09918764e8d2f7a407f1f61587c20ec92a25631c
 
     student_name = []
     student_id = []
