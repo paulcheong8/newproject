@@ -564,22 +564,23 @@ def displayLiveAttendance(course_code, course_id):
 @app.route('/AttendanceOverview/<course_code>/<course_id>/', methods =['GET', 'POST'])
 @login_required
 def AttendanceOverview(course_code,course_id):
-    week = "week01" #depending on start date of course
+    # week = "week01" #depending on start date of course
 
     student_name = []
     student_id = []
     student_email = []
     attendance = Attendance.query.filter_by(course_id=course_id).all()
     status = []
-    week = [1,2,3,4,5,6,7,8,9,10,11,12,13,14]
+    weeks = [1,2,3,4,5,6,7,8,9,10,11,12,13,14]
+    attendanceWeeks = []
 
     for i in range(len(attendance)):
         
+        attendanceWeeks.append(attendance[i].week)
         student = Student.query.filter_by(id=attendance[i].student_id).first()
         student_id.append(student.id)
         student_name.append(student.name)
         student_email.append(student.email)
-        
         status.append(attendance[i].status)
     
     return render_template(
@@ -587,8 +588,10 @@ def AttendanceOverview(course_code,course_id):
         course_code=course_code,
         student_name=student_name,
         student_email=student_email,
+        student_id=student_id,
         status=status,
-        week=week)
+        week=weeks,
+        attendanceWeeks=attendanceWeeks)
 
 
 @app.route('/getStudentAttendance/<student_email>', methods=["GET"])
