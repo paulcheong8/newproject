@@ -18,8 +18,9 @@ url_sendPhoto = '{}sendPhoto'.format(url_base)
 
 
 r = requests.get(url_getUpdates)
+print ("test");
 results = r.json()["result"]
-
+print (results)
 chat_id_list = []
 
 for update in results:
