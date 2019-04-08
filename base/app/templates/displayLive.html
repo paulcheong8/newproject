@@ -1,7 +1,13 @@
 {% extends "base.html" %}
 
 {% block content %}
-
+<html>
+    <head>
+        <title>Smart Attendance</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/backgroundother.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/util.css') }}">
+    </head>
+    <body>
 <h1> {{ course_code}} </h1>
 
 <h5> {{ date }} </h5>
@@ -36,4 +42,6 @@
     </table>
     </div>
 </div>
+</body>
+</html>
 {% endblock %}
