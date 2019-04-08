@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>View Attendance</h1>
+    <form action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <ul>
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            {% endwith %}
+
+        <p>
+            {{ form.course_code.label }}<br>
+            {{ form.course_code(size=32) }}<br>
+            {% for error in form.course_code.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.attendance_type(size=32) }} <br>
+            {% for error in form.attendance_type.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.submit() }}
+        </p>
+
+
+    </form>
+{% endblock %}
