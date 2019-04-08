@@ -32,6 +32,8 @@
                           {% if attendanceWeeks[i] == week %}
                             <td>{{ status[i] }} </td>
                             {% do doneWeeks.append(week) %}
+                          {% else %}
+                            <td></td>
                           {% endif %}
                         {% endif %}
                       {% endfor %}
