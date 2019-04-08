@@ -1,37 +1,61 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>View Attendance</h1>
-    <form action="" method="post" novalidate>
-        {{ form.hidden_tag() }}
+<html>
+    <head>
+        <title>Smart Attendance</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/backgroundother.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/util.css') }}">
+    </head>
+    <body>
+    <div class="container-contact100">
+        <div class="wrap-contact100">
+            <form action="" method="post" novalidate>
+                {{ form.hidden_tag() }}
+                <span class="contact100-form-title">
+                    View Attendance
+                </span>
 
-            {% with messages = get_flashed_messages() %}
-            {% if messages %}
-            <ul>
-                {% for message in messages %}
-                <li>{{ message }}</li>
-                {% endfor %}
-            </ul>
-            {% endif %}
-            {% endwith %}
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                <ul>
+                    {% for message in messages %}
+                    <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                {% endwith %}
 
-        <p>
-            {{ form.course_code.label }}<br>
-            {{ form.course_code(size=32) }}<br>
-            {% for error in form.course_code.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.attendance_type(size=32) }} <br>
-            {% for error in form.attendance_type.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.submit() }}
-        </p>
+                <div class="label">
+                    {{ form.course_code.label }}<br>
+                </div>
+                <div class="wrap-input100">   
+                    {{ form.course_code(size=32) }}<br>
+                    {% for error in form.course_code.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                    <span class="focus-input100"></span>
+                </div>
 
-
-    </form>
+                <div class="wrap-input100">   
+                    {{ form.attendance_type(size=32) }} <br>
+                    {% for error in form.attendance_type.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                    <span class="focus-input100"></span>
+                </div>
+    
+                <div class="container-contact100-form-btn">
+                    <button class="contact100-form-btn">
+                        <span>
+                            {{ form.submit() }}
+                            Search
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    </body>
+</html>
 {% endblock %}
