@@ -86,6 +86,7 @@ def updateInformation():
         # filename = secure_filename(student_details.filename)
         contents = student_details.read()
 
+        contents = contents.decode()
         contents_stripped = contents.rstrip("\r\n")
         contents_split = contents_stripped.split("\r\n")
         first_row = True
@@ -565,7 +566,6 @@ def displayLiveAttendance(course_code, course_id):
 @app.route('/AttendanceOverview/<course_code>/<course_id>/', methods =['GET', 'POST'])
 @login_required
 def AttendanceOverview(course_code,course_id):
-    week = "week01" #depending on start date of course
 
     student_name = []
     student_id = []
