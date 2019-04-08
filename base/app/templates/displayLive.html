@@ -8,13 +8,14 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='css/util.css') }}">
     </head>
     <body>
+<div class="messages">
 <h1> {{ course_code}} </h1>
-
 <h5> {{ date }} </h5>
-<div class="card animate animated fadeInRight" style="width: 18rem;">
+</div>
+<div class="card animate animated fadeInRight">
     <div class="card-body">
         <table class="table table-hover">
-            <thead class ='thead-light'>
+            <thead class ='thead-dark'>
               <tr>
                 <th>Name</th>
                 <th>Email</th>
@@ -23,7 +24,6 @@
             </thead>
             <tbody>
                 {% for n in range(student_name| length) %}
-                  {% set sid = student_id[n] %}
                   {% if attendance_count[n] > 2 %}
                     <tr bgcolor='#90EE90'>
                       <td>{{ student_name[n] }}</td>

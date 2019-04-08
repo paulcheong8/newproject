@@ -10,18 +10,18 @@
     </head>
     <body>
         <div class="container-contact100">
-            <div class="button" >
-                <a class="buttons" href="{{ url_for('student_add_mac') }}">
-                    <center><img src="{{ url_for('static', filename='img/plus_icon.png') }}" width="100" height="100"></center>
+            <div class="button">
+                <a class="buttons" href="{{ url_for('updateInformation') }}">
+                    <img src="{{ url_for('static', filename='img/add.png') }}">
                 </a>
                 <div class="text">
-                    Update Mac Addresses
-                </div> 
+                    Update Mac Address
+                </div>
             </div>
             <div class="divider"></div>
             <div class="button">
                 <a class="buttons" href="{{ url_for('attendance') }}">
-                    <center><img src="{{ url_for('static', filename='img/eye_icon.png') }}" width="160" height="100"></center>
+                    <img src="{{ url_for('static', filename='img/view.png') }}">
                 </a>
                 <div class="text">
                     View Attendance
