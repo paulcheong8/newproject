@@ -18,9 +18,7 @@ url_sendPhoto = '{}sendPhoto'.format(url_base)
 
 
 r = requests.get(url_getUpdates)
-print ("test");
 results = r.json()["result"]
-print (results)
 chat_id_list = []
 
 for update in results:
@@ -331,7 +329,7 @@ def attendance():
 def addreadings():
     try:
         student_mac_dict = {} #get a dictionary that can store SID : mac address
-        instances_required = 12 #depending on lesson duration
+        instances_required = 10 #depending on lesson duration
 
         current_datetime = datetime.now() + timedelta(seconds=28800)
         datetime_string = current_datetime.strftime("%Y-%m-%d %H:%M") # cannot use timedelta
@@ -476,6 +474,7 @@ def addreadings():
                                 new_attendance = Attendance(status="Present", student_id=sid, course_id=course_id, week=week)
                                 db.session.add(new_attendance)
                                 db.session.commit()
+                                print ("line 479")
                             else:
                                 attendance_records = db.session.query(Attendance).filter(Attendance.student_id==sid).all()
                                 course_records = []
@@ -483,16 +482,20 @@ def addreadings():
                                 for record in attendance_records:
                                     course_records.append(record.course_id)
                                     week_records.append(record.week)
+                                print ("Course Records line 486: ", course_records)
+                                print ("Week Records line 487: ", week_records)
                                 # validation for subsequent week's attends for that one course 
                                 if (week not in week_records) and (course_id in course_records):
                                     new_attendance = Attendance(status="Present", student_id=sid, course_id=course_id, week=week)
                                     db.session.add(new_attendance)
                                     db.session.commit()
+                                    print ("line 494")
                                 # validation for a new course's attendance
                                 if (week not in week_records) and (course_id not in course_records):
                                     new_attendance = Attendance(status="Present", student_id=sid, course_id=course_id, week=week)
                                     db.session.add(new_attendance)
                                     db.session.commit()
+                                    print ("line 500")
 
                         else:
                             if db.session.query(db.exists().where(AttendanceTemp.student_id == str(sid))).scalar():
@@ -538,7 +541,6 @@ def displayLiveAttendance(course_code, course_id):
     date = date.strftime("%Y-%m-%d %H:%M")
 
     all = db.session.query(student_course_table).all()
-    print (all)
     for i in all:
         # print (type(i[1]))
         if i[1] == int(course_id):
@@ -579,15 +581,37 @@ def AttendanceOverview(course_code,course_id):
     weeks = [1,2,3,4,5,6,7,8,9,10,11,12,13,14]
     attendanceWeeks = []
 
-    for i in range(len(attendance)):
+    # for i in range(len(attendance)):
         
-        attendanceWeeks.append(attendance[i].week)
-        student = Student.query.filter_by(id=attendance[i].student_id).first()
-        student_id.append(student.id)
-        student_name.append(student.name)
-        student_email.append(student.email)
-        status.append(attendance[i].status)
-    
+    #     attendanceWeeks.append(attendance[i].week)
+    #     student = Student.query.filter_by(id=attendance[i].student_id).first()
+    #     student_id.append(student.id)
+    #     student_name.append(student.name)
+    #     student_email.append(student.email)
+    #     status.append(attendance[i].status)
+
+    all = db.session.query(student_course_table).all()        
+    for i in all:
+        if i[1] == int(course_id):
+            student_id.append(i[0])
+            # if student id does not exist in attendance table
+            if not db.session.query(db.exists().where(Attendance.student_id == str(i[0]))).scalar():
+                status.append(0)
+            else:
+                attendance_record = db.session.query(Attendance).filter(Attendance.student_id==str(i[0])).first()
+                status.append(attendance_record.status)
+        student = db.session.query(Student).filter(Student.id==str(i[0])).first()
+        sname = str(student.name)
+        student_name.append(sname)
+        semail = str(student.email)
+        student_email.append(semail)
+    # print (all)
+    # print (student_id)
+    # print (student_name)
+    # print (status)
+    # print (len(status))
+
+
     return render_template(
         "displayOverview.html",
         course_code=course_code,
@@ -595,7 +619,7 @@ def AttendanceOverview(course_code,course_id):
         student_email=student_email,
         student_id=student_id,
         status=status,
-        week=weeks,
+        weeks=weeks,
         attendanceWeeks=attendanceWeeks)
 
 

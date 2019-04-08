@@ -17,16 +17,17 @@
                 </span>
                 
                 {% with messages = get_flashed_messages() %}
-                    {% if messages %}
-                    <ul>
-                        {% for message in messages %}
-                        <div class="message">
+                {% if messages %}
+                <ul>
+                    {% for message in messages %}
+                    <div class='messages'>
                         <li>{{ message }}</li>
-                        </div>
-                        {% endfor %}
-                    </ul>
-                    {% endif %}
+                    </div>
+                    {% endfor %}
+                </ul>
+                {% endif %}
                 {% endwith %}
+                
 
                 <div class="label">
                     {{ form.name.label }} (As per matriculation)

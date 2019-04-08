@@ -2,8 +2,15 @@
 
 {% block content %}
 <html>
+<head>
+    <title>Smart Attendance</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/backgroundother.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/util.css') }}">
+</head>
 <body>
-<h1> {{ course_code }} </h1>
+<div class='messages'>
+    <h1> {{ course_code }} </h1>
+</div>
 <div class="card animate animated fadeInRight">
     <div class="card-body">
         <table class="table table-hover">
@@ -11,50 +18,26 @@
               <tr>
                 <th></th>
                 {% for week in weeks%}
-                  <th>{{week}}</th>
+                  <th>Week {{week}}</th>
                 {% endfor %}
               </tr>
             </thead>
             <tbody>
-                {% set printed_students=[] %}
                 {% for n in range(student_name| length) %}
-                  {% set curr_name = student_name[n] %}
-                  {% set doneWeeks = [] %}
-                  {% for i in range(student_name| length) %}
-                    {% if student_name[i] == curr_name %}
-                      {% if student_id[i] not in printed_students %}
-                        <tr>
-                          <td>{{$student_name[i]}}</td>
-                        {% do printed_students.append(student_id[n]) %}
-                      {% endif %}
-                      {% for week in weeks %}
-                        {% if week not in doneWeeks %}
-                          {% if attendanceWeeks[i] == week %}
-                            <td>{{ status[i] }} </td>
-                            {% do doneWeeks.append(week) %}
+                  <div class='messages'>
+                      <tr>
+                          <td> {{ student_name[n] }} </td>
+    
+                          {% if status[n] == 'Present' %}
+                            <td bgcolor='#90EE90'> {{ status[n] }} </td>
                           {% else %}
-                            <td></td>
-                            {% do doneWeeks.append(week) %}
+                          <td bgcolor='#FFA07A'> {{ status[n] }} </td>
                           {% endif %}
-                        {% endif %}
-                      {% endfor %}
-                    {% endif %}
-                  {% endfor %}
+                        </tr>
+                  </div>
+
                 {% endfor %}
-                  <!-- {% if status[n]=='Present' %}
-                    <tr bgcolor='#90EE90'>
-                      <td>{{ student_name[n] }}</td>
-                      <td>{{ student_email[n] }}</td>
-                      <td>{{ status[n] }}</td>
-                    </tr>
-                  {% else %}
-                    <tr bgcolor='#FFA07A'>
-                      <td>{{ student_name[n] }}</td>
-                      <td>{{ student_email[n] }}</td>
-                      <td>{{ status[n] }}</td>
-                    </tr>
-                  {% endif %}
-                {% endfor %} -->
+
             </tbody>
         </table>
     </div>
