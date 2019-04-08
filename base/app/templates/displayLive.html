@@ -24,7 +24,6 @@
             </thead>
             <tbody>
                 {% for n in range(student_name| length) %}
-                  {% set sid = student_id[n] %}
                   {% if attendance_count[n] > 2 %}
                     <tr bgcolor='#90EE90'>
                       <td>{{ student_name[n] }}</td>
