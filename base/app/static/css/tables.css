@@ -1,0 +1,15 @@
+@font-face {
+    font-family: Ubuntu-Bold;
+    src: url('../fonts/ubuntu/Ubuntu-Bold.ttf'); 
+}
+  
+.contents {
+    color: white;
+    font-family: Ubuntu-Bold;
+}
+
+.thead {
+    color: black;
+    background: white;
+    font-family: Ubuntu-Bold;
+}

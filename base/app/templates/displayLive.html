@@ -6,23 +6,24 @@
         <title>Smart Attendance</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='css/backgroundother.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/util.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/tables.css') }}">
     </head>
     <body>
 <div class="messages">
 <h1> {{ course_code}} </h1>
 <h5> {{ date }} </h5>
 </div>
-<div class="card animate animated fadeInRight">
+<!-- <div class="card animate animated fadeInRight"> -->
     <div class="card-body">
         <table class="table table-hover">
-            <thead class ='thead-dark'>
+            <thead class ='thead'>
               <tr>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Attendance</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody class="contents">
                 {% for n in range(student_name| length) %}
                   {% if attendance_count[n] == 0 %}
                     <tr bgcolor='#FFA07A'>
@@ -45,9 +46,9 @@
                   {% endif %}
                 {% endfor %}
             </tbody>
-    </table>
+        </table>
     </div>
-</div>
+<!-- </div> -->
 </body>
 </html>
 {% endblock %}
